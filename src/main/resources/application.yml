@@ -1,0 +1,78 @@
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/lightning-trade
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  main:
+    allow-bean-definition-overriding: true
+  # 包扫描配置
+  component-scan:
+    base-packages: com.lightningtrade.easyquant
+
+# 交易配置
+trading:
+  us:
+    enabled: true  # 是否启用美股交易
+    strategy:
+      type: DOUBLE_MA  # 双均线策略
+      shortPeriod: 5   # 5日EMA
+      longPeriod: 20   # 20日EMA
+    symbols:  # 交易的股票列表
+      - symbol: AAPL
+        position-ratio: 0.3  # 仓位比例
+        max-position: 1000   # 最大持仓数量
+      - symbol: TSLA
+        position-ratio: 0.2
+        max-position: 500
+  hk:
+    enabled: true  # 是否启用港股交易
+    strategy:
+      type: BOLL     # 布林带策略
+      shortPeriod: 20  # 20日移动平均
+      kValue: 2.0     # 标准差倍数
+    symbols:  # 交易的股票列表
+      - symbol: 00700
+        position-ratio: 0.3
+        max-position: 1000
+      - symbol: 09988
+        position-ratio: 0.2
+        max-position: 500
+
+# 日志配置
+logging:
+  level:
+    root: INFO
+    com.lightningtrade.easyquant: DEBUG
+  file:
+    name: logs/lightning-trade.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+backtest:
+  enabled: true  # 启用回测
+  initial-capital: 1000000  # 初始资金100万
+  start-time: 2024-01-01 09:30:00  # 回测开始时间
+  end-time: 2024-03-01 16:00:00    # 回测结束时间
+  market: "US"  # 选择美股市场
+  symbols:
+    AAPL:  # 苹果股票
+      symbol: "AAPL"
+      lot-size: 100
+      initial-position: 0
+    TSLA:  # 特斯拉股票
+      symbol: "TSLA"
+      lot-size: 100
+      initial-position: 0
