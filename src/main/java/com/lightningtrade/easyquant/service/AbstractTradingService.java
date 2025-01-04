@@ -2,19 +2,15 @@ package com.lightningtrade.easyquant.service;
 
 import com.lightningtrade.easyquant.config.TradingConfig;
 import com.lightningtrade.easyquant.execution.TradeExecutor;
+import com.lightningtrade.easyquant.model.MarketData;
 import com.lightningtrade.easyquant.strategy.StrategyFactory;
 import com.lightningtrade.easyquant.strategy.TradingStrategy;
-import com.lightningtrade.easyquant.backtest.BacktestResult;
-import com.lightningtrade.easyquant.backtest.BacktestTradeRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class AbstractTradingService {
@@ -29,8 +25,8 @@ public abstract class AbstractTradingService {
     @Autowired
     protected StrategyFactory strategyFactory;
 
-    protected final Map<String, TradingStrategy> strategies = new ConcurrentHashMap<>();
-    protected final Map<String, Integer> positions = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String, TradingStrategy> strategies = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<String, Integer> positions = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -70,17 +66,5 @@ public abstract class AbstractTradingService {
 
     protected abstract TradingConfig.Strategy getStrategyConfig();
 
-    protected abstract void processMarketData(Map<String, Object> data);
-
-    protected Map<String, Object> convertToMarketData(Map<String, Object> histData) {
-        Map<String, Object> md = new HashMap<>();
-        md.put("symbol", histData.get("symbol"));
-        md.put("time", histData.get("time"));
-        md.put("open", histData.get("open"));
-        md.put("high", histData.get("high"));
-        md.put("low", histData.get("low"));
-        md.put("close", histData.get("close"));
-        md.put("volume", histData.get("volume"));
-        return md;
-    }
+    protected abstract void processMarketData(MarketData data);
 }

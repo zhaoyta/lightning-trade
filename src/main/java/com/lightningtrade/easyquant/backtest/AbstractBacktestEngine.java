@@ -3,13 +3,13 @@ package com.lightningtrade.easyquant.backtest;
 import com.lightningtrade.easyquant.strategy.TradingStrategy;
 import org.springframework.stereotype.Component;
 import com.tigerbrokers.stock.openapi.client.struct.enums.KType;
-
+import com.lightningtrade.easyquant.model.MarketData;
 import java.util.*;
 
 @Component
 public abstract class AbstractBacktestEngine {
 
-    public abstract BacktestResult runBacktest(String symbol, List<Map<String, Object>> historicalData,
+    public abstract BacktestResult runBacktest(String symbol, List<MarketData> historicalData,
             TradingStrategy strategy, double initialCapital, KType kType);
 
     protected BacktestResult createEmptyResult(String symbol, double initialCapital, KType kType) {
@@ -35,14 +35,6 @@ public abstract class AbstractBacktestEngine {
 
         int totalTrades = trades.size();
         int winningTrades = 0;
-        double totalProfit = 0;
-
-        for (BacktestTradeRecord trade : trades) {
-            if (trade.getProfit() > 0) {
-                winningTrades++;
-            }
-            totalProfit += trade.getProfit();
-        }
 
         // 计算胜率
         double winRate = (double) winningTrades / totalTrades;

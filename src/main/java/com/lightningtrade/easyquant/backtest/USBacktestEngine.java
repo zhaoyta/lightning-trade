@@ -2,7 +2,7 @@ package com.lightningtrade.easyquant.backtest;
 
 import com.lightningtrade.easyquant.strategy.TradingStrategy;
 import com.tigerbrokers.stock.openapi.client.struct.enums.KType;
-
+import com.lightningtrade.easyquant.model.MarketData;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -14,7 +14,7 @@ public class USBacktestEngine extends BacktestEngine {
     private static final int LOT_SIZE = 100; // 美股标准手数为100股
 
     @Override
-    public BacktestResult runBacktest(String symbol, List<Map<String, Object>> historicalData,
+    public BacktestResult runBacktest(String symbol, List<MarketData> historicalData,
             TradingStrategy strategy, double initialCapital, KType kType) {
         if (historicalData == null || historicalData.isEmpty()) {
             return createEmptyResult(symbol, initialCapital, kType);

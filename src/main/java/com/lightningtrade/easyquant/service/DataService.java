@@ -1,6 +1,7 @@
 package com.lightningtrade.easyquant.service;
 
 import com.lightningtrade.easyquant.entity.HistoricalData;
+import com.lightningtrade.easyquant.model.MarketData;
 import com.lightningtrade.easyquant.repository.HistoricalDataRepository;
 import com.tigerbrokers.stock.openapi.client.https.client.TigerHttpClient;
 import com.tigerbrokers.stock.openapi.client.https.request.quote.QuoteKlineRequest;
@@ -8,21 +9,21 @@ import com.tigerbrokers.stock.openapi.client.https.request.quote.QuoteTradeCalen
 import com.tigerbrokers.stock.openapi.client.https.response.quote.QuoteKlineResponse;
 import com.tigerbrokers.stock.openapi.client.https.response.quote.QuoteTradeCalendarResponse;
 import com.tigerbrokers.stock.openapi.client.struct.enums.KType;
+import com.tigerbrokers.stock.openapi.client.struct.enums.Market;
 import com.tigerbrokers.stock.openapi.client.struct.enums.TimeZoneId;
 import com.tigerbrokers.stock.openapi.client.util.DateUtils;
 import com.tigerbrokers.stock.openapi.client.https.domain.quote.item.KlineItem;
 import com.tigerbrokers.stock.openapi.client.https.domain.quote.item.KlinePoint;
 import com.tigerbrokers.stock.openapi.client.https.domain.quote.item.TradeCalendar;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.tigerbrokers.stock.openapi.client.struct.enums.Market;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DataService {
@@ -74,10 +75,10 @@ public class DataService {
      * @param kType     K线类型
      * @return K线数据列表
      */
-    public List<Map<String, Object>> getHistoricalData(String symbol, String market, LocalDateTime startTime,
+    public List<MarketData> getHistoricalData(String symbol, String market, LocalDateTime startTime,
             LocalDateTime endTime,
             KType kType) {
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<MarketData> result = new ArrayList<>();
 
         try {
             // 先从数据库获取数据
@@ -89,27 +90,20 @@ public class DataService {
                 // 获取预期的K线数量
                 int expectedCount = calculateKlineCount(market, kType, startTime, endTime);
 
-                // 如果数据库中的数据量小于预期，从API重新获取
-                if (dbData.size() < expectedCount) {
-                    logger.warn("数据库中的数据不完整 - 股票: {}, 市场: {}, K线类型: {}, 实际数量: {}, 预期数量: {}",
-                            symbol, market, kType, dbData.size(), expectedCount);
-                } else {
-                    // 数据完整，直接返回数据库中的数据
-                    logger.info("从数据库获取历史数据 - 股票: {}, 市场: {}, K线类型: {}, 数据点数: {}",
-                            symbol, market, kType, dbData.size());
-                    for (HistoricalData data : dbData) {
-                        Map<String, Object> map = new HashMap<>();
-                        map.put("symbol", data.getSymbol());
-                        map.put("time", Date.from(data.getDateTime().atZone(ZoneId.systemDefault()).toInstant()));
-                        map.put("open", data.getOpen());
-                        map.put("high", data.getHigh());
-                        map.put("low", data.getLow());
-                        map.put("close", data.getClose());
-                        map.put("volume", data.getVolume());
-                        result.add(map);
-                    }
-                    return result;
+                // 如果数据完整，直接返回
+                if (dbData.size() == expectedCount) {
+                    return dbData.stream()
+                            .map(this::convertToMarketData)
+                            .collect(Collectors.toList());
                 }
+
+                logger.warn("数据库中的数据不完整 - 股票: {}, 市场: {}, K线类型: {}, 实际数量: {}, 预期数量: {}",
+                        symbol, market, kType, dbData.size(), expectedCount);
+
+                // 删除不完整的数据
+                historicalDataRepository.deleteAll(dbData);
+                logger.info("删除旧数据 - 股票: {}, 市场: {}, K线类型: {}, 数据点数: {}",
+                        symbol, market, kType, dbData.size());
             }
 
             // 如果数据库中没有数据或数据不完整，从API获取
@@ -181,15 +175,15 @@ public class DataService {
                         dataToSave.add(data);
 
                         // 添加到结果集
-                        Map<String, Object> kline = new HashMap<>();
-                        kline.put("symbol", symbol);
-                        kline.put("time", Date.from(itemTime.atZone(ZoneId.systemDefault()).toInstant()));
-                        kline.put("open", point.getOpen());
-                        kline.put("high", point.getHigh());
-                        kline.put("low", point.getLow());
-                        kline.put("close", point.getClose());
-                        kline.put("volume", point.getVolume());
-                        result.add(kline);
+                        MarketData marketData = new MarketData();
+                        marketData.setSymbol(symbol);
+                        marketData.setDateTime(itemTime);
+                        marketData.setOpen(point.getOpen());
+                        marketData.setHigh(point.getHigh());
+                        marketData.setLow(point.getLow());
+                        marketData.setClose(point.getClose());
+                        marketData.setVolume((long) point.getVolume());
+                        result.add(marketData);
                     }
 
                     if (reachEndTime) {
@@ -201,30 +195,33 @@ public class DataService {
 
             } while (pageToken != null && !reachEndTime);
 
-            // 批量保存数据到数据库
+            // 保存数据到数据库
             if (!dataToSave.isEmpty()) {
-                // 如果是重新获取数据，先删除旧数据
-                if (!dbData.isEmpty()) {
-                    historicalDataRepository.deleteAll(dbData);
-                    logger.info("删除旧数据 - 股票: {}, 市场: {}, K线类型: {}, 数据点数: {}",
-                            symbol, market, kType, dbData.size());
-                }
-
                 historicalDataRepository.saveAll(dataToSave);
                 logger.info("保存K线数据成功 - 股票: {}, 市场: {}, K线类型: {}, 数据点数: {}",
                         symbol, market, kType, dataToSave.size());
             }
 
-            // 按时间排序
-            result.sort((a, b) -> ((Date) a.get("time")).compareTo((Date) b.get("time")));
-
             logger.info("获取K线数据成功 - 股票: {}, 市场: {}, K线类型: {}, 数据点数: {}",
                     symbol, market, kType, result.size());
-        } catch (Exception e) {
-            logger.error("获取K线数据异常 - 股票: {}, 市场: {}", symbol, market, e);
-        }
+            return result;
 
-        return result;
+        } catch (Exception e) {
+            logger.error("获取K线数据异常", e);
+            return new ArrayList<>();
+        }
+    }
+
+    private MarketData convertToMarketData(HistoricalData historicalData) {
+        MarketData marketData = new MarketData();
+        marketData.setSymbol(historicalData.getSymbol());
+        marketData.setDateTime(historicalData.getDateTime());
+        marketData.setOpen(historicalData.getOpen());
+        marketData.setHigh(historicalData.getHigh());
+        marketData.setLow(historicalData.getLow());
+        marketData.setClose(historicalData.getClose());
+        marketData.setVolume((long) historicalData.getVolume());
+        return marketData;
     }
 
     /**

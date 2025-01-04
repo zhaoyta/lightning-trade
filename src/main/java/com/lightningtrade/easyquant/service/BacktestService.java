@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import com.lightningtrade.easyquant.model.MarketData;
+
 @Service
 public class BacktestService {
     private static final Logger logger = LoggerFactory.getLogger(BacktestService.class);
@@ -38,7 +40,7 @@ public class BacktestService {
 
         try {
             // 获取历史数据
-            List<Map<String, Object>> historicalData = dataService.getHistoricalData(symbol, strategyConfig.getMarket(),
+            List<MarketData> historicalData = dataService.getHistoricalData(symbol, strategyConfig.getMarket(),
                     startTime, endTime, KType.valueOf(strategyConfig.getKType()));
             if (historicalData.isEmpty()) {
                 logger.warn("未获取到历史数据 - 股票: {}", symbol);

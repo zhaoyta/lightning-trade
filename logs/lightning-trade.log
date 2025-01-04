@@ -4221,3 +4221,78 @@ java.lang.NullPointerException: null
 2025-01-04 15:29:08.399 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-01-04 15:29:08.404 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2025-01-04 15:29:08.412 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-01-04 15:34:50.837 [main] INFO  c.l.e.LightningTradeApplication - Starting LightningTradeApplication using Java 11.0.17 on MacdeMac-mini.local with PID 7667 (/Users/apple/WorkSpace/lightning-trade/target/classes started by apple in /Users/apple/WorkSpace/lightning-trade)
+2025-01-04 15:34:50.839 [main] DEBUG c.l.e.LightningTradeApplication - Running with Spring Boot v2.7.0, Spring v5.3.20
+2025-01-04 15:34:50.840 [main] INFO  c.l.e.LightningTradeApplication - No active profile set, falling back to 1 default profile: "default"
+2025-01-04 15:34:52.408 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-01-04 15:34:52.573 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 106 ms. Found 1 JPA repository interfaces.
+2025-01-04 15:34:53.879 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2025-01-04 15:34:53.892 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-01-04 15:34:53.893 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.63]
+2025-01-04 15:34:54.065 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-01-04 15:34:54.065 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 3109 ms
+2025-01-04 15:34:54.178 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-01-04 15:34:54.436 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-01-04 15:34:54.474 [main] INFO  o.s.b.a.h.H2ConsoleAutoConfiguration - H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/lightning-trade'
+2025-01-04 15:34:54.812 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-01-04 15:34:54.854 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.9.Final
+2025-01-04 15:34:55.042 [main] INFO  o.h.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-01-04 15:34:55.152 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2025-01-04 15:34:55.721 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-01-04 15:34:55.728 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-01-04 15:34:57.939 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=null, kType=day)
+2025-01-04 15:34:57.996 [main] INFO  c.l.e.service.HKTradingService - 初始化交易服务 - 策略: BOLL, 交易品种数量: 2
+2025-01-04 15:34:58.005 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: DOUBLE_MA, 参数: TradingConfig.Strategy(type=DOUBLE_MA, shortPeriod=5, longPeriod=20, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=null, kType=day)
+2025-01-04 15:34:58.006 [main] INFO  c.l.e.service.USTradingService - 初始化交易服务 - 策略: DOUBLE_MA, 交易品种数量: 2
+2025-01-04 15:34:58.149 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-01-04 15:34:58.414 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page template: index
+2025-01-04 15:34:58.782 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2025-01-04 15:34:58.801 [main] INFO  c.l.e.LightningTradeApplication - Started LightningTradeApplication in 9.095 seconds (JVM running for 9.799)
+2025-01-04 15:36:24.476 [http-nio-8080-exec-5] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-01-04 15:36:24.481 [http-nio-8080-exec-5] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-01-04 15:36:24.499 [http-nio-8080-exec-5] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 17 ms
+2025-01-04 15:36:24.621 [http-nio-8080-exec-5] INFO  c.l.e.controller.BacktestController - 接收到的原始请求体: BacktestRequest{symbol='00700', strategyType='BOLL', market='HK', initialCapital=1000000.0, startTime=2024-12-29T00:00, endTime=2025-01-03T23:59:59, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, kType='min15'}
+2025-01-04 15:36:24.663 [http-nio-8080-exec-5] INFO  c.l.e.controller.BacktestController - 收到回测请求 - 股票: 00700, 市场: HK, 策略: BOLL, K线周期: min15, 初始资金: 1000000.0
+2025-01-04 15:36:24.663 [http-nio-8080-exec-5] INFO  c.l.e.service.BacktestService - 开始回测 - 策略: BOLL, 股票: 00700, 初始资金: 1000000.0
+2025-01-04 15:36:25.166 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 交易日数量: 3
+2025-01-04 15:36:25.167 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: HK, K线类型: min15, 开始时间: 2024-12-29T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 66
+2025-01-04 15:36:25.167 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 从数据库获取历史数据 - 股票: 00700, 市场: HK, K线类型: min15, 数据点数: 76
+2025-01-04 15:36:25.168 [http-nio-8080-exec-5] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=HK, kType=min15)
+2025-01-04 15:36:25.185 [http-nio-8080-exec-5] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: 00700, 收益率: -0.029798029899999964, 最大回撤: 0.029798029899999964
+2025-01-04 16:20:20.010 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s46ms).
+2025-01-04 16:38:15.070 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s34ms).
+2025-01-04 16:56:16.986 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m31s856ms).
+2025-01-04 17:14:01.608 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m44s579ms).
+2025-01-04 17:31:56.622 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m54s995ms).
+2025-01-04 17:47:36.958 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=13m40s307ms).
+2025-01-04 18:03:32.009 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s50ms).
+2025-01-04 18:19:57.068 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s56ms).
+2025-01-04 18:37:22.160 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s54ms).
+2025-01-04 18:48:39.835 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=9m17s612ms).
+2025-01-04 19:08:03.040 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m53s155ms).
+2025-01-04 19:26:28.150 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s65ms).
+2025-01-04 19:43:53.219 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s41ms).
+2025-01-04 20:05:18.299 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m54s985ms).
+2025-01-04 20:24:13.333 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m55s7ms).
+2025-01-04 20:40:10.528 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=15m27s188ms).
+2025-01-04 20:56:35.703 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=54s933ms).
+2025-01-04 21:09:48.618 [HikariPool-1 housekeeper] WARN  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=12m42s898ms).
+2025-01-04 21:09:54.509 [http-nio-8080-exec-9] INFO  c.l.e.controller.BacktestController - 接收到的原始请求体: BacktestRequest{symbol='00700', strategyType='BOLL', market='HK', initialCapital=1000000.0, startTime=2024-12-29T00:00, endTime=2025-01-03T23:59:59, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, kType='min15'}
+2025-01-04 21:09:54.510 [http-nio-8080-exec-9] INFO  c.l.e.controller.BacktestController - 收到回测请求 - 股票: 00700, 市场: HK, 策略: BOLL, K线周期: min15, 初始资金: 1000000.0
+2025-01-04 21:09:54.510 [http-nio-8080-exec-9] INFO  c.l.e.service.BacktestService - 开始回测 - 策略: BOLL, 股票: 00700, 初始资金: 1000000.0
+2025-01-04 21:09:55.095 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 交易日数量: 3
+2025-01-04 21:09:55.101 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: HK, K线类型: min15, 开始时间: 2024-12-29T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 66
+2025-01-04 21:09:55.105 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 从数据库获取历史数据 - 股票: 00700, 市场: HK, K线类型: min15, 数据点数: 76
+2025-01-04 21:09:55.106 [http-nio-8080-exec-9] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=HK, kType=min15)
+2025-01-04 21:09:55.109 [http-nio-8080-exec-9] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: 00700, 收益率: -0.029798029899999964, 最大回撤: 0.029798029899999964
+2025-01-04 21:10:02.479 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 交易日数量: 3
+2025-01-04 21:10:02.479 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: HK, K线类型: min1, 开始时间: 2024-12-29T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 990
+2025-01-04 21:10:02.480 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 从数据库获取历史数据 - 股票: 00700, 市场: HK, K线类型: min1, 数据点数: 1140
+2025-01-04 21:10:03.919 [http-nio-8080-exec-3] INFO  c.l.e.controller.BacktestController - 接收到的原始请求体: BacktestRequest{symbol='00700', strategyType='BOLL', market='HK', initialCapital=1000000.0, startTime=2024-12-29T00:00, endTime=2025-01-03T23:59:59, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, kType='min1'}
+2025-01-04 21:10:03.926 [http-nio-8080-exec-3] INFO  c.l.e.controller.BacktestController - 收到回测请求 - 股票: 00700, 市场: HK, 策略: BOLL, K线周期: min1, 初始资金: 1000000.0
+2025-01-04 21:10:03.927 [http-nio-8080-exec-3] INFO  c.l.e.service.BacktestService - 开始回测 - 策略: BOLL, 股票: 00700, 初始资金: 1000000.0
+2025-01-04 21:10:04.061 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 交易日数量: 3
+2025-01-04 21:10:04.061 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: HK, K线类型: min1, 开始时间: 2024-12-29T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 990
+2025-01-04 21:10:04.061 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 从数据库获取历史数据 - 股票: 00700, 市场: HK, K线类型: min1, 数据点数: 1140
+2025-01-04 21:10:04.066 [http-nio-8080-exec-3] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=HK, kType=min1)
+2025-01-04 21:10:04.074 [http-nio-8080-exec-3] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: 00700, 收益率: -0.0048882584028318524, 最大回撤: 0.13394326348485708

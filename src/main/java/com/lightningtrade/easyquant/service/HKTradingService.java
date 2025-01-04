@@ -1,6 +1,7 @@
 package com.lightningtrade.easyquant.service;
 
 import com.lightningtrade.easyquant.config.TradingConfig;
+import com.lightningtrade.easyquant.model.MarketData;
 import com.lightningtrade.easyquant.strategy.TradingStrategy;
 import com.lightningtrade.easyquant.backtest.BacktestResult;
 import com.lightningtrade.easyquant.backtest.BacktestTradeRecord;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +37,9 @@ public class HKTradingService extends AbstractTradingService {
             return List.of();
         }
         return tradingConfig.getMarkets().get(MARKET).getSymbols().values()
-                .stream().collect(Collectors.toList());
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -49,9 +51,9 @@ public class HKTradingService extends AbstractTradingService {
     }
 
     @Override
-    protected void processMarketData(Map<String, Object> data) {
+    protected void processMarketData(MarketData data) {
         // 处理市场数据
-        String symbol = (String) data.get("symbol");
+        String symbol = data.getSymbol();
         TradingStrategy strategy = strategies.get(symbol);
         if (strategy == null) {
             logger.warn("未找到策略配置 - 股票: {}", symbol);
@@ -82,16 +84,16 @@ public class HKTradingService extends AbstractTradingService {
         // 根据信号执行交易
         if ("BUY".equals(lastTrade.getType())) {
             if (position <= 0) {
-                double price = (double) data.get("close");
+                double price = data.getClose();
                 int lotSize = symbolConfig.getLotSize();
 
                 Long orderId = tradeExecutor.placeMarketOrder(
                         symbol, lotSize, SecType.STK, Currency.HKD, ActionType.BUY);
 
                 if (orderId != null) {
-                    positions.put(symbol, position + lotSize);
-                    logger.info("买入订单执行成功 - 股票: {}, 订单ID: {}, 数量: {}",
-                            symbol, orderId, lotSize);
+                    positions.put(symbol, lotSize);
+                    logger.info("下单成功 - 股票: {}, 订单号: {}, 数量: {}, 方向: {}",
+                            symbol, orderId, lotSize, "BUY");
                 }
             }
         } else if ("SELL".equals(lastTrade.getType())) {
@@ -101,8 +103,8 @@ public class HKTradingService extends AbstractTradingService {
 
                 if (orderId != null) {
                     positions.put(symbol, 0);
-                    logger.info("卖出订单执行成功 - 股票: {}, 订单ID: {}, 数量: {}",
-                            symbol, orderId, position);
+                    logger.info("下单成功 - 股票: {}, 订单号: {}, 数量: {}, 方向: {}",
+                            symbol, orderId, position, "SELL");
                 }
             }
         }
