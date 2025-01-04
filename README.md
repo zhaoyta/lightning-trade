@@ -1,101 +1,64 @@
 # Lightning Trade - 量化交易系统
 
-## 项目介绍
-基于 Spring Boot 的量化交易系统，集成老虎证券 API，支持美股和港股的自动化交易。系统提供了回测功能，可以在历史数据上测试交易策略的表现。
+一个基于 Spring Boot 的量化交易系统，支持美股和港股市场的实时交易和策略回测。
 
-### 主要特性
+## 最新更新
+
+- 重构了所有交易策略实现，采用更高效的数据结构和算法
+- 优化了策略工厂，支持更灵活的策略参数配置
+- 重新设计了配置文件结构，使用 YAML 格式提供更好的可读性
+- 改进了市场配置，增加了股票手数(lotSize)配置
+- 优化了各个策略的实现：
+  - MACD 策略：使用 EMA 计算，支持自定义信号周期
+  - RSI 策略：支持自定义超买超卖阈值
+  - 布林带策略：优化了计算方法，使用队列存储数据
+  - 双均线策略：改进了交叉判断逻辑
+  - MA 交叉策略：新增 1% 的确认区间
+- 删除了冗余的 application.properties 文件
+
+## 功能特点
+
+### 实时交易
 - 支持美股和港股市场
-- 提供多种交易策略（MA、布林带等）
-- 完整的回测系统
-- 实时交易执行
-- 历史数据管理
+- 多种交易策略支持：
+  - 双均线策略 (DOUBLE_MA)
+  - MACD策略
+  - 布林带策略 (BOLL)
+  - RSI策略
+- 可配置的股票代码和手数
+- 市场级别的启用/禁用控制
 
-## 项目架构
+### 策略回测
+- 支持选择市场和股票
+- 可配置初始资金
+- 自定义回测日期范围
+- 详细的回测结果展示：
+  - 总收益率
+  - 夏普比率
+  - 最大回撤
+  - 胜率
+  - 权益曲线
 
-### 技术栈
-- Spring Boot 2.7.0
-- Java 11
-- H2 Database
-- Tiger Open API
+## 使用说明
 
-### 核心模块
-1. **配置模块** (`config`)
-   - `ApiConfig`: Tiger API 客户端配置
-   - `TigerApiConfig`: Tiger API 参数配置
+1. 访问首页 (http://localhost:8080/)
+   - 查看各市场配置和交易状态
+   - 监控策略参数和股票信息
 
-2. **策略模块** (`strategy`)
-   - 布林带策略
-   - 双均线策略
-   - 支持自定义策略扩展
+2. 实时交易 (http://localhost:8080/trading)
+   - 查看实时交易信号
+   - 监控持仓状态
 
-3. **回测模块** (`backtest`)
-   - 支持美股/港股回测
-   - 提供回测报告
-   - 交易成本计算
+3. 策略回测 (http://localhost:8080/backtest)
+   - 选择市场和股票
+   - 设置策略参数
+   - 配置回测周期
+   - 查看回测结果和权益曲线
 
-4. **交易执行** (`execution`)
-   - 订单管理
-   - 实时交易执行
+## 技术栈
 
-## 代码结构 
-
-## 如何运行
-
-### 环境要求
-- Java 11+
-- Maven 3.6+
-- VSCode + Java 插件
-- Tiger API 账号
-
-### 配置步骤
-
-1. 配置 Tiger API
-创建 `tiger_openapi_config.properties` 文件：
-```properties
-private_key_pk1=你的私钥
-private_key_pk8=你的私钥
-tiger_id=你的tiger_id
-account=你的账号
-license=你的license
-env=环境配置
-```
-
-2. 配置 VSCode 启动参数
-在 `.vscode/launch.json` 中添加：
-```json
-{
-    "type": "java",
-    "name": "LightningTradeApplication",
-    "request": "launch",
-    "mainClass": "com.lightningtrade.easyquant.LightningTradeApplication",
-    "projectName": "lightning-trade",
-    "env": {
-        "tiger.config.path": "/path/to/tiger_openapi_config.properties"
-    }
-}
-```
-
-### 运行步骤
-1. 克隆项目
-2. 在 VSCode 中打开项目
-3. 配置 Tiger API 参数
-4. 运行 `LightningTradeApplication`
-
-## 开发指南
-
-### 添加新策略
-1. 在 `strategy` 包下创建新的策略类
-2. 实现交易逻辑
-3. 在配置中启用新策略
-
-### 回测流程
-1. 配置回测参数
-2. 选择要测试的策略
-3. 运行回测
-4. 分析回测结果
-
-## 注意事项
-- 确保 Tiger API 配置文件格式正确
-- 注意交易时间（美股/港股市场时间）
-- 建议先在回测环境中测试策略
-- 实盘交易前请仔细检查配置参数 
+- Spring Boot
+- Thymeleaf
+- Bootstrap 5
+- Tiger API
+- Java 17 

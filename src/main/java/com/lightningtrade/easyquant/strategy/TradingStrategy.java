@@ -1,31 +1,11 @@
 package com.lightningtrade.easyquant.strategy;
 
-import com.lightningtrade.easyquant.model.MarketData;
-import com.lightningtrade.easyquant.model.Signal;
+import com.lightningtrade.easyquant.backtest.BacktestResult;
+import com.tigerbrokers.stock.openapi.client.struct.enums.KType;
 
-/**
- * 交易策略接口
- */
+import java.util.List;
+import java.util.Map;
+
 public interface TradingStrategy {
-    /**
-     * 执行策略
-     * 
-     * @param data 市场数据
-     * @return 交易信号
-     */
-    Signal execute(MarketData data);
-
-    /**
-     * 初始化策略
-     */
-    default void initialize() {
-        // 默认空实现
-    }
-
-    /**
-     * 重置策略状态
-     */
-    default void reset() {
-        // 默认空实现
-    }
+    BacktestResult backtest(String symbol, List<Map<String, Object>> data, double initialCapital, KType kType);
 }

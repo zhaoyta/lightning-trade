@@ -19,6 +19,7 @@ public class HistoricalData {
     private double low;
     private double close;
     private double volume;
+    private String kType; // day, week, month, year, min1, min3, min5, min15, min30, min60, min120, min240
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

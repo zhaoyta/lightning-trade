@@ -1,105 +1,78 @@
 package com.lightningtrade.easyquant.service;
 
-import com.lightningtrade.easyquant.backtest.*;
-import com.lightningtrade.easyquant.model.MarketData;
-import com.lightningtrade.easyquant.strategy.MACrossStrategy;
+import com.lightningtrade.easyquant.backtest.BacktestEngine;
+import com.lightningtrade.easyquant.backtest.BacktestResult;
+import com.lightningtrade.easyquant.config.TradingConfig;
+import com.lightningtrade.easyquant.strategy.StrategyFactory;
 import com.lightningtrade.easyquant.strategy.TradingStrategy;
-import com.lightningtrade.easyquant.entity.HistoricalData;
+import com.tigerbrokers.stock.openapi.client.struct.enums.KType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
-public class BacktestService implements CommandLineRunner {
+public class BacktestService {
     private static final Logger logger = LoggerFactory.getLogger(BacktestService.class);
-
-    @Value("${backtest.enabled:false}")
-    private boolean backtestEnabled;
 
     @Autowired
     private DataService dataService;
 
     @Autowired
-    private BacktestConfig backtestConfig;
+    private StrategyFactory strategyFactory;
 
-    @Override
-    public void run(String... args) {
-        if (!backtestEnabled) {
-            logger.info("回测功能未启用，跳过回测执行");
-            return;
+    @Autowired
+    private BacktestEngine backtestEngine;
+
+    public BacktestResult runBacktest(String symbol, TradingConfig.Strategy strategyConfig,
+            LocalDateTime startTime, LocalDateTime endTime, double initialCapital) {
+        if (symbol == null || symbol.trim().isEmpty()) {
+            throw new IllegalArgumentException("交易品种不能为空");
         }
 
-        logger.info("开始运行回测策略...");
+        logger.info("开始回测 - 策略: {}, 股票: {}, 初始资金: {}",
+                strategyConfig.getType(), symbol, initialCapital);
 
-        // 根据配置创建策略实例
-        Map<String, TradingStrategy> strategies = new HashMap<>();
-        for (Map.Entry<String, BacktestConfig.SymbolConfig> entry : backtestConfig.getSymbols().entrySet()) {
-            strategies.put(entry.getKey(), new MACrossStrategy(5, 20));
+        try {
+            // 获取历史数据
+            List<Map<String, Object>> historicalData = dataService.getHistoricalData(symbol, strategyConfig.getMarket(),
+                    startTime, endTime, KType.valueOf(strategyConfig.getKType()));
+            if (historicalData.isEmpty()) {
+                logger.warn("未获取到历史数据 - 股票: {}", symbol);
+                return createEmptyResult(Collections.singletonList(symbol), initialCapital);
+            }
+
+            // 创建策略实例
+            TradingStrategy strategy = strategyFactory.createStrategy(strategyConfig);
+
+            // 执行回测
+            BacktestResult result = backtestEngine.runBacktest(symbol, historicalData, strategy, initialCapital,
+                    KType.valueOf(strategyConfig.getKType()));
+
+            logger.info("回测完成 - 股票: {}, 收益率: {}, 最大回撤: {}",
+                    symbol, result.getTotalReturn(), result.getMaxDrawdown());
+
+            return result;
+
+        } catch (Exception e) {
+            logger.error("回测过程发生错误 - 股票: " + symbol, e);
+            return createEmptyResult(Collections.singletonList(symbol), initialCapital);
         }
-
-        // 获取历史数据
-        Map<String, List<MarketData>> historicalData = loadHistoricalData();
-
-        if (historicalData.isEmpty()) {
-            logger.warn("没有找到历史数据，回测终止");
-            return;
-        }
-
-        // 创建回测引擎
-        AbstractBacktestEngine engine;
-        if ("US".equals(backtestConfig.getMarket())) {
-            engine = new USBacktestEngine(strategies, backtestConfig.getInitialCapital());
-        } else {
-            engine = new HKBacktestEngine(strategies, backtestConfig.getInitialCapital());
-        }
-
-        // 运行回测
-        engine.run(historicalData);
     }
 
-    private Map<String, List<MarketData>> loadHistoricalData() {
-        Map<String, List<MarketData>> data = new HashMap<>();
-
-        // 获取每个股票的历史数据
-        for (String symbol : backtestConfig.getSymbols().keySet()) {
-            List<HistoricalData> histData = dataService.getHistoricalData(symbol,
-                    backtestConfig.getStartTime(), backtestConfig.getEndTime());
-
-            if (histData == null || histData.isEmpty()) {
-                logger.warn("未找到股票{}的历史数据", symbol);
-                continue;
-            }
-
-            // 转换数据格式
-            List<MarketData> symbolData = new ArrayList<>();
-            for (HistoricalData hist : histData) {
-                if (hist != null) {
-                    MarketData md = new MarketData();
-                    md.setSymbol(hist.getSymbol());
-                    md.setDateTime(hist.getDateTime());
-                    md.setOpen(hist.getOpen());
-                    md.setHigh(hist.getHigh());
-                    md.setLow(hist.getLow());
-                    md.setClose(hist.getClose());
-                    md.setVolume((long) hist.getVolume());
-                    symbolData.add(md);
-                }
-            }
-
-            if (!symbolData.isEmpty()) {
-                data.put(symbol, symbolData);
-            }
-        }
-
-        return data;
+    private BacktestResult createEmptyResult(List<String> symbols, double initialCapital) {
+        BacktestResult result = new BacktestResult();
+        result.setInitialCapital(initialCapital);
+        result.setFinalCapital(initialCapital);
+        result.setTotalReturn(0);
+        result.setMaxDrawdown(0);
+        result.setSharpeRatio(0);
+        result.setWinRate(0);
+        result.setTrades(Collections.emptyList());
+        result.setEquityCurve(Collections.singletonList(initialCapital));
+        return result;
     }
 }

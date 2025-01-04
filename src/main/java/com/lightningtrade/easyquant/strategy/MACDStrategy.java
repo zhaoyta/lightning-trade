@@ -1,92 +1,84 @@
 package com.lightningtrade.easyquant.strategy;
 
-import com.lightningtrade.easyquant.model.MarketData;
-import com.lightningtrade.easyquant.model.Signal;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.ta4j.core.*;
-import org.ta4j.core.indicators.EMAIndicator;
-import org.ta4j.core.indicators.MACDIndicator;
-import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
+import org.springframework.stereotype.Component;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
-import java.time.ZoneId;
+@Component
+public class MACDStrategy extends AbstractTradingStrategy {
+    private final int fastPeriod;
+    private final int slowPeriod;
+    private final int signalPeriod;
+    private double fastEMA = 0;
+    private double slowEMA = 0;
+    private double signalEMA = 0;
+    private Double lastMACD = null;
+    private Double lastSignal = null;
+    private boolean initialized = false;
+    private int count = 0;
 
-/**
- * MACD策略
- * 当MACD线上穿信号线时买入
- * 当MACD线下穿信号线时卖出
- */
-public class MACDStrategy implements TradingStrategy {
-    private static final Logger logger = LoggerFactory.getLogger(MACDStrategy.class);
+    public MACDStrategy() {
+        this(12, 26, 9); // 默认使用12、26、9
+    }
 
-    private final int shortPeriod;
-    private final int longPeriod;
-    private BarSeries series;
-
-    public MACDStrategy(int shortPeriod, int longPeriod) {
-        this.shortPeriod = shortPeriod;
-        this.longPeriod = longPeriod;
-        logger.info("初始化MACD策略 - 短期: {}, 长期: {}", shortPeriod, longPeriod);
+    public MACDStrategy(int fastPeriod, int slowPeriod, int signalPeriod) {
+        this.fastPeriod = fastPeriod;
+        this.slowPeriod = slowPeriod;
+        this.signalPeriod = signalPeriod;
     }
 
     @Override
-    public void initialize() {
-        this.series = new BaseBarSeries();
-        logger.info("初始化价格序列");
-    }
+    protected String calculateSignal(Map<String, Object> data) {
+        double price = (double) data.get("close");
+        count++;
 
-    @Override
-    public Signal execute(MarketData marketData) {
-        // 更新价格序列
-        series.addBar(marketData.getDateTime().atZone(ZoneId.systemDefault()),
-                marketData.getOpen(),
-                marketData.getHigh(),
-                marketData.getLow(),
-                marketData.getClose(),
-                marketData.getVolume());
-
-        logger.debug("添加新的价格数据 - 时间: {}, 收盘价: {}",
-                marketData.getDateTime(),
-                marketData.getClose());
-
-        // 数据点不足时返回持仓信号
-        if (series.getBarCount() < longPeriod) {
-            logger.debug("数据点数量({})不足长期周期({}), 返回持仓信号",
-                    series.getBarCount(), longPeriod);
-            return Signal.HOLD;
+        if (!initialized) {
+            if (count < slowPeriod) {
+                // 累积足够的数据来初始化EMA
+                return null;
+            } else if (count == slowPeriod) {
+                // 初始化EMA
+                fastEMA = price;
+                slowEMA = price;
+                initialized = true;
+                return null;
+            }
         }
 
-        // 计算MACD指标
-        ClosePriceIndicator closePrice = new ClosePriceIndicator(series);
-        MACDIndicator macd = new MACDIndicator(closePrice, shortPeriod, longPeriod);
-        EMAIndicator signal = new EMAIndicator(macd, 9); // 信号线，一般用9日EMA
+        // 更新EMA
+        double fastAlpha = 2.0 / (fastPeriod + 1);
+        double slowAlpha = 2.0 / (slowPeriod + 1);
+        double signalAlpha = 2.0 / (signalPeriod + 1);
 
-        int lastIndex = series.getEndIndex();
-        double macdValue = macd.getValue(lastIndex).doubleValue();
-        double signalValue = signal.getValue(lastIndex).doubleValue();
-        double prevMacdValue = macd.getValue(lastIndex - 1).doubleValue();
-        double prevSignalValue = signal.getValue(lastIndex - 1).doubleValue();
+        fastEMA = price * fastAlpha + fastEMA * (1 - fastAlpha);
+        slowEMA = price * slowAlpha + slowEMA * (1 - slowAlpha);
 
-        logger.debug("MACD计算结果 - MACD线: {}, 信号线: {}", macdValue, signalValue);
+        // 计算MACD
+        double macd = fastEMA - slowEMA;
 
-        // MACD线上穿信号线，买入信号
-        if (prevMacdValue <= prevSignalValue && macdValue > signalValue) {
-            logger.info("产生买入信号 - MACD线上穿信号线");
-            logger.info("MACD: {} -> {}, 信号线: {} -> {}",
-                    prevMacdValue, macdValue,
-                    prevSignalValue, signalValue);
-            return Signal.BUY;
-        }
-        // MACD线下穿信号线，卖出信号
-        else if (prevMacdValue >= prevSignalValue && macdValue < signalValue) {
-            logger.info("产生卖出信号 - MACD线下穿信号线");
-            logger.info("MACD: {} -> {}, 信号线: {} -> {}",
-                    prevMacdValue, macdValue,
-                    prevSignalValue, signalValue);
-            return Signal.SELL;
+        // 更新信号线
+        if (lastMACD == null) {
+            signalEMA = macd;
+        } else {
+            signalEMA = macd * signalAlpha + signalEMA * (1 - signalAlpha);
         }
 
-        logger.debug("无交易信号");
-        return Signal.HOLD;
+        String signal = null;
+        if (lastMACD != null && lastSignal != null) {
+            // MACD金叉：MACD线从下穿过信号线
+            if (lastMACD <= lastSignal && macd > signalEMA) {
+                signal = "BUY";
+            }
+            // MACD死叉：MACD线从上穿过信号线
+            else if (lastMACD >= lastSignal && macd < signalEMA) {
+                signal = "SELL";
+            }
+        }
+
+        lastMACD = macd;
+        lastSignal = signalEMA;
+
+        return signal;
     }
 }

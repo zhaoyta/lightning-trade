@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Lightning Trade - 策略回测</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <style>
+        .daterangepicker {
+            font-family: inherit;
+        }
+
+        .daterangepicker td.active {
+            background-color: #0d6efd;
+        }
+
+        #klineChart {
+            width: 100%;
+            height: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">Lightning Trade</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/trading">实时交易</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/backtest">策略回测</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">策略回测</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="backtestForm" action="/api/backtest/run" method="POST">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">市场</label>
+                                    <select class="form-select" name="market" id="marketSelect">
+                                        <option value="US">美股市场</option>
+                                        <option value="HK">港股市场</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">股票</label>
+                                    <select class="form-select" name="symbol" id="symbolSelect">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">策略类型</label>
+                                    <select class="form-select" name="strategyType" id="strategySelect">
+                                        <option value="MA">单均线策略</option>
+                                        <option value="DOUBLE_MA">双均线策略</option>
+                                        <option value="MACD">MACD策略</option>
+                                        <option value="BOLL">布林带策略</option>
+                                        <option value="RSI">RSI策略</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">K线周期</label>
+                                    <select class="form-select" name="kType" id="kTypeSelect">
+                                        <optgroup label="基础周期">
+                                            <option value="day">日K线</option>
+                                            <option value="week">周K线</option>
+                                            <option value="month">月K线</option>
+                                        </optgroup>
+                                        <optgroup label="分钟周期">
+                                            <option value="min1">1分钟</option>
+                                            <option value="min3">3分钟</option>
+                                            <option value="min5">5分钟</option>
+                                            <option value="min15">15分钟</option>
+                                            <option value="min30">30分钟</option>
+                                            <option value="min60">60分钟</option>
+                                            <option value="min120">120分钟</option>
+                                            <option value="min240">240分钟</option>
+                                        </optgroup>
+                                    </select>
+                                    <small class="form-text text-muted" id="klineCountInfo"></small>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">初始资金</label>
+                                    <input type="number" class="form-control" name="initialCapital" value="1000000">
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <label class="form-label">交易日期范围</label>
+                                    <input type="text" class="form-control" id="dateRange" name="dateRange">
+                                    <input type="hidden" name="startDate" id="startDate">
+                                    <input type="hidden" name="endDate" id="endDate">
+                                </div>
+                            </div>
+
+                            <!-- 交易日历显示 -->
+                            <div class="row mb-3">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="card-title mb-0">交易日历</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div id="tradingDays" class="small"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 策略参数 -->
+                            <div id="strategyParams">
+                                <!-- MA策略参数 -->
+                                <div class="strategy-params" id="MA-params">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">均线周期</label>
+                                            <input type="number" class="form-control" name="maPeriod" value="20">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 双均线策略参数 -->
+                                <div class="strategy-params" id="DOUBLE_MA-params" style="display:none;">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">短期均线周期</label>
+                                            <input type="number" class="form-control" name="shortPeriod" value="5">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">长期均线周期</label>
+                                            <input type="number" class="form-control" name="longPeriod" value="20">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- MACD策略参数 -->
+                                <div class="strategy-params" id="MACD-params" style="display:none;">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">快线周期</label>
+                                            <input type="number" class="form-control" name="fastPeriod" value="12">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">慢线周期</label>
+                                            <input type="number" class="form-control" name="slowPeriod" value="26">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">信号周期</label>
+                                            <input type="number" class="form-control" name="signalPeriod" value="9">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 布林带策略参数 -->
+                                <div class="strategy-params" id="BOLL-params" style="display:none;">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">周期</label>
+                                            <input type="number" class="form-control" name="bollPeriod" value="20">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">标准差倍数</label>
+                                            <input type="number" class="form-control" name="kValue" value="2"
+                                                step="0.1">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- RSI策略参数 -->
+                                <div class="strategy-params" id="RSI-params" style="display:none;">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">RSI周期</label>
+                                            <input type="number" class="form-control" name="rsiPeriod" value="14">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">超卖阈值</label>
+                                            <input type="number" class="form-control" name="oversoldThreshold"
+                                                value="30">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">超买阈值</label>
+                                            <input type="number" class="form-control" name="overboughtThreshold"
+                                                value="70">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">开始回测</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- K线图 -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">K线图</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="klineChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 回测结果 -->
+        <div class="row mt-4" id="backtestResult" style="display:none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">回测结果</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <canvas id="equityChart"></canvas>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <th>总收益率</th>
+                                            <td id="totalReturn">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>夏普比率</th>
+                                            <td id="sharpeRatio">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>最大回撤</th>
+                                            <td id="maxDrawdown">-</td>
+                                        </tr>
+                                        <tr>
+                                            <th>胜率</th>
+                                            <td id="winRate">-</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+    <script>
+        // 设置默认日期范围
+        function setDefaultDateRange() {
+            const today = new Date();
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            const sevenDaysAgo = new Date(yesterday);
+            sevenDaysAgo.setDate(yesterday.getDate() - 7);
+
+            $('#dateRange').daterangepicker({
+                startDate: sevenDaysAgo,
+                endDate: yesterday,
+                locale: {
+                    format: 'YYYY-MM-DD',
+                    separator: ' 至 ',
+                    applyLabel: '确定',
+                    cancelLabel: '取消',
+                    fromLabel: '从',
+                    toLabel: '到',
+                    customRangeLabel: '自定义',
+                    weekLabel: 'W',
+                    daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+                    monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
+                }
+            }, function (start, end) {
+                $('#startDate').val(start.format('YYYY-MM-DD'));
+                $('#endDate').val(end.format('YYYY-MM-DD'));
+                updateTradingDays();
+                updateKlineChart();
+            });
+
+            // 初始化隐藏的输入框值
+            $('#startDate').val(sevenDaysAgo.toISOString().split('T')[0]);
+            $('#endDate').val(yesterday.toISOString().split('T')[0]);
+        }
+
+        // 页面加载时设置默认日期
+        document.addEventListener('DOMContentLoaded', function () {
+            setDefaultDateRange();
+        });
+
+        // 策略参数切换
+        document.getElementById('strategySelect').addEventListener('change', function () {
+            document.querySelectorAll('.strategy-params').forEach(div => {
+                div.style.display = 'none';
+            });
+            document.getElementById(this.value + '-params').style.display = 'block';
+        });
+
+        let equityChart = null; // 添加全局变量来跟踪图表实例
+
+        // 表单提交
+        document.getElementById('backtestForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const startDate = formData.get('startDate');
+            const endDate = formData.get('endDate');
+            const kType = formData.get('kType');
+            const market = formData.get('market');
+
+            // 构建请求数据
+            const requestData = {
+                symbol: formData.get('symbol'),
+                market: market.toUpperCase(),
+                strategyType: formData.get('strategyType'),
+                initialCapital: parseFloat(formData.get('initialCapital')),
+                startTime: startDate + ' 00:00:00',
+                endTime: endDate + ' 23:59:59',
+                kType: kType
+            };
+
+            // 根据策略类型添加相应的参数
+            switch (formData.get('strategyType')) {
+                case 'MA':
+                    requestData.shortPeriod = parseInt(formData.get('maPeriod'));
+                    break;
+                case 'DOUBLE_MA':
+                    requestData.shortPeriod = parseInt(formData.get('shortPeriod'));
+                    requestData.longPeriod = parseInt(formData.get('longPeriod'));
+                    break;
+                case 'MACD':
+                    requestData.shortPeriod = parseInt(formData.get('fastPeriod'));
+                    requestData.longPeriod = parseInt(formData.get('slowPeriod'));
+                    requestData.signalPeriod = parseInt(formData.get('signalPeriod'));
+                    break;
+                case 'BOLL':
+                    requestData.shortPeriod = parseInt(formData.get('bollPeriod'));
+                    requestData.kValue = parseFloat(formData.get('kValue'));
+                    break;
+                case 'RSI':
+                    requestData.shortPeriod = parseInt(formData.get('rsiPeriod'));
+                    requestData.oversoldThreshold = parseFloat(formData.get('oversoldThreshold'));
+                    requestData.overboughtThreshold = parseFloat(formData.get('overboughtThreshold'));
+                    break;
+            }
+
+            console.log('Sending backtest request:', requestData);
+
+            // 发送请求
+            fetch('/api/backtest/run', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('回测请求失败');
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    // 显示回测结果
+                    document.getElementById('backtestResult').style.display = 'block';
+                    document.getElementById('totalReturn').textContent = (result.totalReturn * 100).toFixed(2) + '%';
+                    document.getElementById('sharpeRatio').textContent = result.sharpeRatio.toFixed(2);
+                    document.getElementById('maxDrawdown').textContent = (result.maxDrawdown * 100).toFixed(2) + '%';
+                    document.getElementById('winRate').textContent = (result.winRate * 100).toFixed(2) + '%';
+
+                    // 销毁旧的图表实例
+                    if (equityChart) {
+                        equityChart.destroy();
+                    }
+
+                    // 绘制权益曲线
+                    const ctx = document.getElementById('equityChart').getContext('2d');
+                    equityChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: Array.from({ length: result.equityCurve.length }, (_, i) => i + 1),
+                            datasets: [{
+                                label: '账户权益',
+                                data: result.equityCurve,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: false
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('回测失败:', error);
+                    alert('回测执行失败，请检查参数后重试');
+                });
+        });
+
+        // 市场和股票选择联动
+        document.getElementById('marketSelect').addEventListener('change', function () {
+            const market = this.value.toUpperCase();
+            console.log('Market changed to:', market);
+            const symbolSelect = document.getElementById('symbolSelect');
+            symbolSelect.innerHTML = ''; // 清空现有选项
+
+            // 添加加载提示
+            const loadingOption = document.createElement('option');
+            loadingOption.textContent = '加载中...';
+            symbolSelect.appendChild(loadingOption);
+
+            fetch(`/api/trading/markets/${market}/symbols`)
+                .then(response => response.json())
+                .then(symbols => {
+                    // 清空所有选项，包括加载提示
+                    symbolSelect.innerHTML = '';
+
+                    // 按股票代码排序
+                    symbols.sort((a, b) => a.code.localeCompare(b.code));
+
+                    symbols.forEach(symbol => {
+                        const option = document.createElement('option');
+                        option.value = symbol.code;
+                        option.textContent = symbol.code;
+                        symbolSelect.appendChild(option);
+                    });
+                    console.log('Symbols loaded, updating chart...');
+                    updateKlineChart();
+                })
+                .catch(error => {
+                    console.error('Error loading symbols:', error);
+                    symbolSelect.innerHTML = '';
+                    const errorOption = document.createElement('option');
+                    errorOption.textContent = '加载失败';
+                    symbolSelect.appendChild(errorOption);
+                    alert('加载股票列表失败');
+                });
+        });
+
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('DOM loaded, initializing components...');
+            setDefaultDateRange();
+            // 触发市场选择的change事件来加载股票列表
+            document.getElementById('marketSelect').dispatchEvent(new Event('change'));
+        });
+
+        function updateTradingDays() {
+            const startDate = document.querySelector('input[name="startDate"]').value;
+            const endDate = document.querySelector('input[name="endDate"]').value;
+            const market = document.getElementById('marketSelect').value.toUpperCase();
+
+            if (startDate && endDate && market) {
+                fetch(`/api/backtest/tradingDays?market=${market}&startDate=${startDate}&endDate=${endDate}`)
+                    .then(response => response.json())
+                    .then(tradingDays => {
+                        const tradingDaysDiv = document.getElementById('tradingDays');
+                        if (tradingDays && tradingDays.length > 0) {
+                            tradingDaysDiv.innerHTML = `
+                                <p>交易日期列表（共 ${tradingDays.length} 个交易日）：</p>
+                                <div class="row">
+                                    ${tradingDays.map(day => `
+                                        <div class="col-md-2 mb-1">
+                                            <span class="badge bg-primary">${day}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `;
+                        } else {
+                            tradingDaysDiv.innerHTML = '<p class="text-warning">所选日期范围内没有交易日</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('获取交易日历失败:', error);
+                        document.getElementById('tradingDays').innerHTML =
+                            '<p class="text-danger">获取交易日历失败，请重试</p>';
+                    });
+            }
+        }
+
+        let klineChart = null;
+
+        function updateKlineChart() {
+            const symbol = document.getElementById('symbolSelect').value;
+            const startDate = document.querySelector('input[name="startDate"]').value;
+            const endDate = document.querySelector('input[name="endDate"]').value;
+            const kType = document.getElementById('kTypeSelect').value;
+            const market = document.getElementById('marketSelect').value.toUpperCase();
+
+            console.log('Updating K-line chart with:', { symbol, startDate, endDate, kType, market });
+
+            if (symbol && startDate && endDate) {
+                fetch(`/api/backtest/kline?symbol=${symbol}&startDate=${startDate}&endDate=${endDate}&kType=${kType}&market=${market}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Received K-line data:', data);
+
+                        // 始终重新初始化图表
+                        initKlineChart();
+
+                        // 处理数据并转换时间格式
+                        const klineData = data.map(item => {
+                            const date = new Date(item.time);
+                            return {
+                                time: date.getTime() / 1000,
+                                open: parseFloat(item.open),
+                                high: parseFloat(item.high),
+                                low: parseFloat(item.low),
+                                close: parseFloat(item.close)
+                            };
+                        });
+
+                        // 按时间排序
+                        klineData.sort((a, b) => a.time - b.time);
+
+                        console.log('Setting chart data:', klineData);
+
+                        // 创建K线图
+                        const candlestickSeries = klineChart.addCandlestickSeries({
+                            upColor: '#26a69a',
+                            downColor: '#ef5350',
+                            borderVisible: false,
+                            wickUpColor: '#26a69a',
+                            wickDownColor: '#ef5350',
+                        });
+                        candlestickSeries.setData(klineData);
+
+                        // 自动调整视图以显示所有数据
+                        klineChart.timeScale().fitContent();
+                    })
+                    .catch(error => {
+                        console.error('获取K线数据失败:', error);
+                    });
+            } else {
+                console.log('Missing required parameters:', { symbol, startDate, endDate });
+            }
+        }
+
+        function initKlineChart() {
+            console.log('Initializing K-line chart...');
+            const chartContainer = document.getElementById('klineChart');
+
+            // 确保容器存在
+            if (!chartContainer) {
+                console.error('Chart container not found!');
+                return;
+            }
+
+            // 如果已经存在图表实例，先销毁它
+            if (klineChart) {
+                klineChart.remove();
+                klineChart = null;
+            }
+
+            klineChart = LightweightCharts.createChart(chartContainer, {
+                width: chartContainer.clientWidth,
+                height: 400,
+                layout: {
+                    background: { color: '#ffffff' },
+                    textColor: '#333333',
+                },
+                grid: {
+                    vertLines: { color: '#e0e0e0' },
+                    horzLines: { color: '#e0e0e0' },
+                },
+                crosshair: {
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                },
+                rightPriceScale: {
+                    borderColor: '#e0e0e0',
+                    scaleMargins: {
+                        top: 0.1,
+                        bottom: 0.1,
+                    },
+                },
+                timeScale: {
+                    borderColor: '#e0e0e0',
+                    timeVisible: true,
+                    secondsVisible: false,
+                    barSpacing: 10,
+                    minBarSpacing: 5,
+                },
+                handleScale: {
+                    mouseWheel: true,
+                    pinch: true,
+                    axisPressedMouseMove: true,
+                },
+                handleScroll: {
+                    mouseWheel: true,
+                    pressedMouseMove: true,
+                    horzTouchDrag: true,
+                    vertTouchDrag: true,
+                },
+            });
+
+            return klineChart;
+        }
+
+        // 响应窗口大小变化
+        window.addEventListener('resize', () => {
+            if (klineChart) {
+                const chartContainer = document.getElementById('klineChart');
+                klineChart.applyOptions({
+                    width: chartContainer.clientWidth,
+                    height: 400
+                });
+            }
+        });
+
+        // 在股票选择变化时更新K线图
+        document.getElementById('symbolSelect').addEventListener('change', function () {
+            updateKlineChart();
+        });
+
+        // 在K线周期选择变化时更新K线图
+        document.getElementById('kTypeSelect').addEventListener('change', function () {
+            updateKlineChart();
+        });
+    </script>
+</body>
+
+</html>
