@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "LightningTradeApplication",
+            "request": "launch",
+            "mainClass": "com.lightningtrade.easyquant.LightningTradeApplication",
+            "projectName": "lightning-trade",
+            "env": {
+                "tiger.config.path": "/Users/apple/Downloads/tiger_openapi_config.properties"
+            }
+        },
+        {
+            "type": "java",
+            "name": "Debug (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "projectName": "lightning-trade",
+            "env": {
+                "tiger.config.path": "/Users/apple/Downloads/tiger_openapi_config.properties"
+            }
+        }
+    ]
+}
