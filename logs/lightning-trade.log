@@ -4296,3 +4296,208 @@ java.lang.NullPointerException: null
 2025-01-04 21:10:04.061 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 从数据库获取历史数据 - 股票: 00700, 市场: HK, K线类型: min1, 数据点数: 1140
 2025-01-04 21:10:04.066 [http-nio-8080-exec-3] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=HK, kType=min1)
 2025-01-04 21:10:04.074 [http-nio-8080-exec-3] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: 00700, 收益率: -0.0048882584028318524, 最大回撤: 0.13394326348485708
+2025-01-04 21:58:03.465 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 21:58:03.466 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 21:58:03.467 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 从数据库获取历史数据 - 股票: AAPL, 市场: US, K线类型: day, 数据点数: 5
+2025-01-04 21:58:16.377 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-01-04 21:58:16.389 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-01-04 21:58:16.402 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-01-04 21:58:27.079 [main] INFO  c.l.e.LightningTradeApplication - Starting LightningTradeApplication using Java 11.0.17 on MacdeMac-mini.local with PID 58964 (/Users/apple/WorkSpace/lightning-trade/target/classes started by apple in /Users/apple/WorkSpace/lightning-trade)
+2025-01-04 21:58:27.080 [main] DEBUG c.l.e.LightningTradeApplication - Running with Spring Boot v2.7.0, Spring v5.3.20
+2025-01-04 21:58:27.082 [main] INFO  c.l.e.LightningTradeApplication - No active profile set, falling back to 1 default profile: "default"
+2025-01-04 21:58:28.365 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-01-04 21:58:28.495 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 100 ms. Found 1 JPA repository interfaces.
+2025-01-04 21:58:29.531 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2025-01-04 21:58:29.545 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-01-04 21:58:29.545 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.63]
+2025-01-04 21:58:29.732 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-01-04 21:58:29.733 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2541 ms
+2025-01-04 21:58:29.838 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-01-04 21:58:30.115 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-01-04 21:58:30.155 [main] INFO  o.s.b.a.h.H2ConsoleAutoConfiguration - H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/lightning-trade'
+2025-01-04 21:58:30.507 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-01-04 21:58:30.561 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.9.Final
+2025-01-04 21:58:30.707 [main] INFO  o.h.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-01-04 21:58:30.799 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2025-01-04 21:58:31.456 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-01-04 21:58:31.466 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-01-04 21:58:33.970 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=null, kType=day)
+2025-01-04 21:58:34.023 [main] INFO  c.l.e.service.HKTradingService - 初始化交易服务 - 策略: BOLL, 交易品种数量: 2
+2025-01-04 21:58:34.030 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: DOUBLE_MA, 参数: TradingConfig.Strategy(type=DOUBLE_MA, shortPeriod=5, longPeriod=20, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=null, kType=day)
+2025-01-04 21:58:34.030 [main] INFO  c.l.e.service.USTradingService - 初始化交易服务 - 策略: DOUBLE_MA, 交易品种数量: 2
+2025-01-04 21:58:34.137 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-01-04 21:58:34.396 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page template: index
+2025-01-04 21:58:34.714 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2025-01-04 21:58:34.730 [main] INFO  c.l.e.LightningTradeApplication - Started LightningTradeApplication in 8.767 seconds (JVM running for 9.558)
+2025-01-04 21:58:40.495 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-01-04 21:58:40.498 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-01-04 21:58:40.511 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 11 ms
+2025-01-04 21:58:41.267 [http-nio-8080-exec-4] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 21:58:41.268 [http-nio-8080-exec-4] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 21:58:57.711 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 21:58:57.712 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min1, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 1950
+2025-01-04 21:59:03.350 [http-nio-8080-exec-8] INFO  c.l.e.controller.BacktestController - 接收到的原始请求体: BacktestRequest{symbol='AAPL', strategyType='MA', market='US', initialCapital=1000000.0, startTime=2024-12-27T00:00, endTime=2025-01-03T23:59:59, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, kType='min1'}
+2025-01-04 21:59:03.390 [http-nio-8080-exec-8] INFO  c.l.e.controller.BacktestController - 收到回测请求 - 股票: AAPL, 市场: US, 策略: MA, K线周期: min1, 初始资金: 1000000.0
+2025-01-04 21:59:03.391 [http-nio-8080-exec-8] INFO  c.l.e.service.BacktestService - 开始回测 - 策略: MA, 股票: AAPL, 初始资金: 1000000.0
+2025-01-04 21:59:03.517 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 21:59:03.518 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min1, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 1950
+2025-01-04 21:59:03.520 [http-nio-8080-exec-8] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: MA, 参数: TradingConfig.Strategy(type=MA, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=US, kType=min1)
+2025-01-04 21:59:03.528 [http-nio-8080-exec-8] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: AAPL, 收益率: 0.0, 最大回撤: 0.0
+2025-01-04 22:01:18.189 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-01-04 22:01:18.197 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-01-04 22:01:18.211 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-01-04 22:01:23.003 [main] INFO  c.l.e.LightningTradeApplication - Starting LightningTradeApplication using Java 11.0.17 on MacdeMac-mini.local with PID 60136 (/Users/apple/WorkSpace/lightning-trade/target/classes started by apple in /Users/apple/WorkSpace/lightning-trade)
+2025-01-04 22:01:23.005 [main] DEBUG c.l.e.LightningTradeApplication - Running with Spring Boot v2.7.0, Spring v5.3.20
+2025-01-04 22:01:23.007 [main] INFO  c.l.e.LightningTradeApplication - No active profile set, falling back to 1 default profile: "default"
+2025-01-04 22:01:24.397 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-01-04 22:01:24.523 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 99 ms. Found 1 JPA repository interfaces.
+2025-01-04 22:01:25.587 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2025-01-04 22:01:25.606 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-01-04 22:01:25.606 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.63]
+2025-01-04 22:01:25.798 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-01-04 22:01:25.799 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2684 ms
+2025-01-04 22:01:25.893 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-01-04 22:01:26.183 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-01-04 22:01:26.218 [main] INFO  o.s.b.a.h.H2ConsoleAutoConfiguration - H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/lightning-trade'
+2025-01-04 22:01:26.583 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-01-04 22:01:26.635 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.9.Final
+2025-01-04 22:01:26.796 [main] INFO  o.h.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-01-04 22:01:26.892 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2025-01-04 22:01:27.434 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-01-04 22:01:27.442 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-01-04 22:01:29.766 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=null, kType=day)
+2025-01-04 22:01:29.815 [main] INFO  c.l.e.service.HKTradingService - 初始化交易服务 - 策略: BOLL, 交易品种数量: 2
+2025-01-04 22:01:29.819 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: DOUBLE_MA, 参数: TradingConfig.Strategy(type=DOUBLE_MA, shortPeriod=5, longPeriod=20, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=null, kType=day)
+2025-01-04 22:01:29.820 [main] INFO  c.l.e.service.USTradingService - 初始化交易服务 - 策略: DOUBLE_MA, 交易品种数量: 2
+2025-01-04 22:01:29.917 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-01-04 22:01:30.181 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page template: index
+2025-01-04 22:01:30.519 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2025-01-04 22:01:30.544 [main] INFO  c.l.e.LightningTradeApplication - Started LightningTradeApplication in 8.622 seconds (JVM running for 9.276)
+2025-01-04 22:01:34.882 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-01-04 22:01:34.884 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-01-04 22:01:34.891 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 7 ms
+2025-01-04 22:01:35.780 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:01:35.782 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:01:42.470 [http-nio-8080-exec-6] INFO  c.l.e.controller.BacktestController - 接收到的原始请求体: BacktestRequest{symbol='AAPL', strategyType='MA', market='US', initialCapital=1000000.0, startTime=2024-12-27T00:00, endTime=2025-01-03T23:59:59, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, kType='day'}
+2025-01-04 22:01:42.511 [http-nio-8080-exec-6] INFO  c.l.e.controller.BacktestController - 收到回测请求 - 股票: AAPL, 市场: US, 策略: MA, K线周期: day, 初始资金: 1000000.0
+2025-01-04 22:01:42.511 [http-nio-8080-exec-6] INFO  c.l.e.service.BacktestService - 开始回测 - 策略: MA, 股票: AAPL, 初始资金: 1000000.0
+2025-01-04 22:01:42.585 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:01:42.586 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:01:42.586 [http-nio-8080-exec-6] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: MA, 参数: TradingConfig.Strategy(type=MA, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=US, kType=day)
+2025-01-04 22:01:42.587 [http-nio-8080-exec-6] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: AAPL, 收益率: 0.0, 最大回撤: 0.0
+2025-01-04 22:05:03.246 [http-nio-8080-exec-1] WARN  o.s.w.s.m.s.DefaultHandlerExceptionResolver - Resolved [org.springframework.web.HttpMediaTypeNotSupportedException: Content type 'application/x-www-form-urlencoded;charset=UTF-8' not supported]
+2025-01-04 22:06:38.505 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-01-04 22:06:38.512 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-01-04 22:06:38.522 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2025-01-04 22:06:46.046 [main] INFO  c.l.e.LightningTradeApplication - Starting LightningTradeApplication using Java 11.0.17 on MacdeMac-mini.local with PID 62222 (/Users/apple/WorkSpace/lightning-trade/target/classes started by apple in /Users/apple/WorkSpace/lightning-trade)
+2025-01-04 22:06:46.048 [main] DEBUG c.l.e.LightningTradeApplication - Running with Spring Boot v2.7.0, Spring v5.3.20
+2025-01-04 22:06:46.049 [main] INFO  c.l.e.LightningTradeApplication - No active profile set, falling back to 1 default profile: "default"
+2025-01-04 22:06:47.343 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-01-04 22:06:47.465 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 100 ms. Found 1 JPA repository interfaces.
+2025-01-04 22:06:48.558 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2025-01-04 22:06:48.570 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-01-04 22:06:48.570 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.63]
+2025-01-04 22:06:48.751 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-01-04 22:06:48.752 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2605 ms
+2025-01-04 22:06:48.862 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-01-04 22:06:49.126 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-01-04 22:06:49.160 [main] INFO  o.s.b.a.h.H2ConsoleAutoConfiguration - H2 console available at '/h2-console'. Database available at 'jdbc:h2:file:./data/lightning-trade'
+2025-01-04 22:06:49.490 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-01-04 22:06:49.538 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.9.Final
+2025-01-04 22:06:49.678 [main] INFO  o.h.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-01-04 22:06:49.809 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.H2Dialect
+2025-01-04 22:06:50.492 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-01-04 22:06:50.500 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-01-04 22:06:52.709 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: BOLL, 参数: TradingConfig.Strategy(type=BOLL, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=2.0, market=null, kType=day)
+2025-01-04 22:06:52.753 [main] INFO  c.l.e.service.HKTradingService - 初始化交易服务 - 策略: BOLL, 交易品种数量: 2
+2025-01-04 22:06:52.758 [main] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: DOUBLE_MA, 参数: TradingConfig.Strategy(type=DOUBLE_MA, shortPeriod=5, longPeriod=20, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=null, kType=day)
+2025-01-04 22:06:52.759 [main] INFO  c.l.e.service.USTradingService - 初始化交易服务 - 策略: DOUBLE_MA, 交易品种数量: 2
+2025-01-04 22:06:52.851 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-01-04 22:06:53.113 [main] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page template: index
+2025-01-04 22:06:53.431 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2025-01-04 22:06:53.446 [main] INFO  c.l.e.LightningTradeApplication - Started LightningTradeApplication in 8.526 seconds (JVM running for 9.181)
+2025-01-04 22:06:56.557 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-01-04 22:06:56.560 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-01-04 22:06:56.568 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 8 ms
+2025-01-04 22:06:57.405 [http-nio-8080-exec-4] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:06:57.406 [http-nio-8080-exec-4] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:08:00.407 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:08:00.411 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:08:02.392 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:08:02.392 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:08:03.625 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:08:03.625 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:09:10.943 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:09:10.945 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:09:17.540 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:09:17.541 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min1, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 1950
+2025-01-04 22:09:17.812 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 交易日数量: 21
+2025-01-04 22:09:17.813 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min1, 开始时间: 2024-12-05T00:00, 结束时间: 2025-01-04T23:59:59, 数量: 8190
+2025-01-04 22:09:17.813 [http-nio-8080-exec-10] WARN  c.l.easyquant.service.DataService - 数据库中的数据不完整 - 股票: AAPL, 市场: US, K线类型: min1, 实际数量: 1950, 预期数量: 8190
+2025-01-04 22:09:18.471 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 删除旧数据 - 股票: AAPL, 市场: US, K线类型: min1, 数据点数: 1950
+2025-01-04 22:09:22.581 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: min1, 数据点数: 7920
+2025-01-04 22:09:22.583 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: min1, 数据点数: 7920
+2025-01-04 22:09:22.866 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:09:22.867 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min1, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 1950
+2025-01-04 22:09:37.203 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:09:37.205 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:10:55.257 [http-nio-8080-exec-4] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:10:55.259 [http-nio-8080-exec-4] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:11:23.717 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 交易日数量: 11
+2025-01-04 22:11:23.720 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-16T00:00, 结束时间: 2025-01-02T23:59:59, 数量: 11
+2025-01-04 22:11:23.721 [http-nio-8080-exec-9] WARN  c.l.easyquant.service.DataService - 数据库中的数据不完整 - 股票: AAPL, 市场: US, K线类型: day, 实际数量: 4, 预期数量: 11
+2025-01-04 22:11:23.781 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 删除旧数据 - 股票: AAPL, 市场: US, K线类型: day, 数据点数: 4
+2025-01-04 22:11:23.901 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: day, 数据点数: 12
+2025-01-04 22:11:23.901 [http-nio-8080-exec-9] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: day, 数据点数: 12
+2025-01-04 22:11:23.986 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 交易日数量: 11
+2025-01-04 22:11:23.987 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-16T00:00, 结束时间: 2025-01-02T23:59:59, 数量: 11
+2025-01-04 22:11:23.987 [http-nio-8080-exec-8] WARN  c.l.easyquant.service.DataService - 数据库中的数据不完整 - 股票: AAPL, 市场: US, K线类型: day, 实际数量: 12, 预期数量: 11
+2025-01-04 22:11:23.991 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 删除旧数据 - 股票: AAPL, 市场: US, K线类型: day, 数据点数: 12
+2025-01-04 22:11:24.106 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: day, 数据点数: 12
+2025-01-04 22:11:24.106 [http-nio-8080-exec-8] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: day, 数据点数: 12
+2025-01-04 22:11:29.139 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:11:29.139 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:11:43.756 [http-nio-8080-exec-1] INFO  c.l.easyquant.service.DataService - 交易日数量: 6
+2025-01-04 22:11:43.757 [http-nio-8080-exec-1] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-24T00:00, 结束时间: 2025-01-02T23:59:59, 数量: 6
+2025-01-04 22:11:43.847 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 交易日数量: 6
+2025-01-04 22:11:43.848 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-24T00:00, 结束时间: 2025-01-02T23:59:59, 数量: 6
+2025-01-04 22:12:38.553 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:12:38.557 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-27T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 5
+2025-01-04 22:12:51.879 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 交易日数量: 10
+2025-01-04 22:12:51.880 [http-nio-8080-exec-5] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: day, 开始时间: 2024-12-19T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 10
+2025-01-04 22:13:05.014 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 交易日数量: 10
+2025-01-04 22:13:05.014 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min1, 开始时间: 2024-12-19T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 3900
+2025-01-04 22:13:05.014 [http-nio-8080-exec-2] WARN  c.l.easyquant.service.DataService - 数据库中的数据不完整 - 股票: AAPL, 市场: US, K线类型: min1, 实际数量: 3720, 预期数量: 3900
+2025-01-04 22:13:05.259 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 删除旧数据 - 股票: AAPL, 市场: US, K线类型: min1, 数据点数: 3720
+2025-01-04 22:13:06.993 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: min1, 数据点数: 3720
+2025-01-04 22:13:06.994 [http-nio-8080-exec-2] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: min1, 数据点数: 3720
+2025-01-04 22:13:19.469 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:19.470 [http-nio-8080-exec-6] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:33.633 [http-nio-8080-exec-10] INFO  c.l.e.controller.BacktestController - 接收到的原始请求体: BacktestRequest{symbol='AAPL', strategyType='MA', market='US', initialCapital=1000000.0, startTime=2024-12-19T00:00, endTime=2025-01-03T23:59:59, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, kType='min60'}
+2025-01-04 22:13:33.680 [http-nio-8080-exec-10] INFO  c.l.e.controller.BacktestController - 收到回测请求 - 股票: AAPL, 市场: US, 策略: MA, K线周期: min60, 初始资金: 1000000.0
+2025-01-04 22:13:33.681 [http-nio-8080-exec-10] INFO  c.l.e.service.BacktestService - 开始回测 - 策略: MA, 股票: AAPL, 初始资金: 1000000.0
+2025-01-04 22:13:33.761 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 交易日数量: 10
+2025-01-04 22:13:33.762 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min60, 开始时间: 2024-12-19T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 60
+2025-01-04 22:13:33.762 [http-nio-8080-exec-10] WARN  c.l.easyquant.service.DataService - 数据库中的数据不完整 - 股票: AAPL, 市场: US, K线类型: min60, 实际数量: 67, 预期数量: 60
+2025-01-04 22:13:33.784 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 删除旧数据 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:33.868 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:33.869 [http-nio-8080-exec-10] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:33.869 [http-nio-8080-exec-10] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: MA, 参数: TradingConfig.Strategy(type=MA, shortPeriod=20, longPeriod=null, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=US, kType=min60)
+2025-01-04 22:13:33.884 [http-nio-8080-exec-10] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: AAPL, 收益率: 0.0828567056280803, 最大回撤: 0.0
+2025-01-04 22:13:47.442 [http-nio-8080-exec-3] INFO  c.l.e.controller.BacktestController - 接收到的原始请求体: BacktestRequest{symbol='AAPL', strategyType='DOUBLE_MA', market='US', initialCapital=1000000.0, startTime=2024-12-19T00:00, endTime=2025-01-03T23:59:59, shortPeriod=5, longPeriod=20, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, kType='min60'}
+2025-01-04 22:13:47.447 [http-nio-8080-exec-3] INFO  c.l.e.controller.BacktestController - 收到回测请求 - 股票: AAPL, 市场: US, 策略: DOUBLE_MA, K线周期: min60, 初始资金: 1000000.0
+2025-01-04 22:13:47.448 [http-nio-8080-exec-3] INFO  c.l.e.service.BacktestService - 开始回测 - 策略: DOUBLE_MA, 股票: AAPL, 初始资金: 1000000.0
+2025-01-04 22:13:47.536 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 交易日数量: 10
+2025-01-04 22:13:47.536 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min60, 开始时间: 2024-12-19T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 60
+2025-01-04 22:13:47.536 [http-nio-8080-exec-3] WARN  c.l.easyquant.service.DataService - 数据库中的数据不完整 - 股票: AAPL, 市场: US, K线类型: min60, 实际数量: 67, 预期数量: 60
+2025-01-04 22:13:47.549 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 删除旧数据 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:47.641 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:47.641 [http-nio-8080-exec-3] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 67
+2025-01-04 22:13:47.641 [http-nio-8080-exec-3] INFO  c.l.e.strategy.StrategyFactory - 创建策略实例 - 类型: DOUBLE_MA, 参数: TradingConfig.Strategy(type=DOUBLE_MA, shortPeriod=5, longPeriod=20, signalPeriod=null, oversoldThreshold=null, overboughtThreshold=null, kValue=null, market=US, kType=min60)
+2025-01-04 22:13:47.642 [http-nio-8080-exec-3] INFO  c.l.e.service.BacktestService - 回测完成 - 股票: AAPL, 收益率: 0.06067123164672381, 最大回撤: 0.07725530557207996
+2025-01-04 22:13:58.804 [http-nio-8080-exec-7] INFO  c.l.easyquant.service.DataService - 交易日数量: 5
+2025-01-04 22:13:58.804 [http-nio-8080-exec-7] INFO  c.l.easyquant.service.DataService - 计算K线数量 - 市场: US, K线类型: min60, 开始时间: 2024-12-26T00:00, 结束时间: 2025-01-03T23:59:59, 数量: 30
+2025-01-04 22:13:58.804 [http-nio-8080-exec-7] WARN  c.l.easyquant.service.DataService - 数据库中的数据不完整 - 股票: AAPL, 市场: US, K线类型: min60, 实际数量: 37, 预期数量: 30
+2025-01-04 22:13:58.815 [http-nio-8080-exec-7] INFO  c.l.easyquant.service.DataService - 删除旧数据 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 37
+2025-01-04 22:13:58.904 [http-nio-8080-exec-7] INFO  c.l.easyquant.service.DataService - 保存K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 37
+2025-01-04 22:13:58.906 [http-nio-8080-exec-7] INFO  c.l.easyquant.service.DataService - 获取K线数据成功 - 股票: AAPL, 市场: US, K线类型: min60, 数据点数: 37

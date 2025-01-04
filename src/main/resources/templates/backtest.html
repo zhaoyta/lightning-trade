@@ -284,7 +284,8 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src="https://unpkg.com/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+    <script src="/js/kline.js"></script>
     <script>
         // 设置默认日期范围
         function setDefaultDateRange() {
@@ -311,6 +312,7 @@
                     monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月']
                 }
             }, function (start, end) {
+                console.log('Date range changed:', start.format('YYYY-MM-DD'), end.format('YYYY-MM-DD'));
                 $('#startDate').val(start.format('YYYY-MM-DD'));
                 $('#endDate').val(end.format('YYYY-MM-DD'));
                 updateTradingDays();
@@ -320,11 +322,28 @@
             // 初始化隐藏的输入框值
             $('#startDate').val(sevenDaysAgo.toISOString().split('T')[0]);
             $('#endDate').val(yesterday.toISOString().split('T')[0]);
+
+            // 初始化时也要调用一次
+            updateTradingDays();
         }
 
-        // 页面加载时设置默认日期
-        document.addEventListener('DOMContentLoaded', function () {
+        // 页面加载时初始化
+        $(document).ready(function () {
+            console.log('DOM loaded, initializing components...');
             setDefaultDateRange();
+            // 触发市场选择的change事件来加载股票列表
+            document.getElementById('marketSelect').dispatchEvent(new Event('change'));
+            initKlineChart();
+
+            // 在股票选择变化时更新K线图
+            $('#symbolSelect').change(function () {
+                updateKlineChart();
+            });
+
+            // 在K线周期选择变化时更新K线图
+            $('#kTypeSelect').change(function () {
+                updateKlineChart();
+            });
         });
 
         // 策略参数切换
@@ -453,6 +472,9 @@
             loadingOption.textContent = '加载中...';
             symbolSelect.appendChild(loadingOption);
 
+            // 市场变化时更新交易日历
+            updateTradingDays();
+
             fetch(`/api/trading/markets/${market}/symbols`)
                 .then(response => response.json())
                 .then(symbols => {
@@ -481,18 +503,12 @@
                 });
         });
 
-        // 页面加载时初始化
-        document.addEventListener('DOMContentLoaded', function () {
-            console.log('DOM loaded, initializing components...');
-            setDefaultDateRange();
-            // 触发市场选择的change事件来加载股票列表
-            document.getElementById('marketSelect').dispatchEvent(new Event('change'));
-        });
-
         function updateTradingDays() {
             const startDate = document.querySelector('input[name="startDate"]').value;
             const endDate = document.querySelector('input[name="endDate"]').value;
             const market = document.getElementById('marketSelect').value.toUpperCase();
+
+            console.log('Updating trading days:', { startDate, endDate, market });
 
             if (startDate && endDate && market) {
                 fetch(`/api/backtest/tradingDays?market=${market}&startDate=${startDate}&endDate=${endDate}`)
@@ -519,10 +535,10 @@
                         document.getElementById('tradingDays').innerHTML =
                             '<p class="text-danger">获取交易日历失败，请重试</p>';
                     });
+            } else {
+                console.log('Missing required parameters for trading days:', { startDate, endDate, market });
             }
         }
-
-        let klineChart = null;
 
         function updateKlineChart() {
             const symbol = document.getElementById('symbolSelect').value;
@@ -538,39 +554,11 @@
                     .then(response => response.json())
                     .then(data => {
                         console.log('Received K-line data:', data);
-
-                        // 始终重新初始化图表
-                        initKlineChart();
-
-                        // 处理数据并转换时间格式
-                        const klineData = data.map(item => {
-                            const date = new Date(item.time);
-                            return {
-                                time: date.getTime() / 1000,
-                                open: parseFloat(item.open),
-                                high: parseFloat(item.high),
-                                low: parseFloat(item.low),
-                                close: parseFloat(item.close)
-                            };
-                        });
-
-                        // 按时间排序
-                        klineData.sort((a, b) => a.time - b.time);
-
-                        console.log('Setting chart data:', klineData);
-
-                        // 创建K线图
-                        const candlestickSeries = klineChart.addCandlestickSeries({
-                            upColor: '#26a69a',
-                            downColor: '#ef5350',
-                            borderVisible: false,
-                            wickUpColor: '#26a69a',
-                            wickDownColor: '#ef5350',
-                        });
-                        candlestickSeries.setData(klineData);
-
-                        // 自动调整视图以显示所有数据
-                        klineChart.timeScale().fitContent();
+                        if (!data || data.length === 0) {
+                            console.error('No data available for K-line chart');
+                            return;
+                        }
+                        updateKlineChartWithData(data);
                     })
                     .catch(error => {
                         console.error('获取K线数据失败:', error);
@@ -580,85 +568,11 @@
             }
         }
 
-        function initKlineChart() {
-            console.log('Initializing K-line chart...');
-            const chartContainer = document.getElementById('klineChart');
-
-            // 确保容器存在
-            if (!chartContainer) {
-                console.error('Chart container not found!');
-                return;
-            }
-
-            // 如果已经存在图表实例，先销毁它
-            if (klineChart) {
-                klineChart.remove();
-                klineChart = null;
-            }
-
-            klineChart = LightweightCharts.createChart(chartContainer, {
-                width: chartContainer.clientWidth,
-                height: 400,
-                layout: {
-                    background: { color: '#ffffff' },
-                    textColor: '#333333',
-                },
-                grid: {
-                    vertLines: { color: '#e0e0e0' },
-                    horzLines: { color: '#e0e0e0' },
-                },
-                crosshair: {
-                    mode: LightweightCharts.CrosshairMode.Normal,
-                },
-                rightPriceScale: {
-                    borderColor: '#e0e0e0',
-                    scaleMargins: {
-                        top: 0.1,
-                        bottom: 0.1,
-                    },
-                },
-                timeScale: {
-                    borderColor: '#e0e0e0',
-                    timeVisible: true,
-                    secondsVisible: false,
-                    barSpacing: 10,
-                    minBarSpacing: 5,
-                },
-                handleScale: {
-                    mouseWheel: true,
-                    pinch: true,
-                    axisPressedMouseMove: true,
-                },
-                handleScroll: {
-                    mouseWheel: true,
-                    pressedMouseMove: true,
-                    horzTouchDrag: true,
-                    vertTouchDrag: true,
-                },
-            });
-
-            return klineChart;
-        }
-
         // 响应窗口大小变化
         window.addEventListener('resize', () => {
             if (klineChart) {
-                const chartContainer = document.getElementById('klineChart');
-                klineChart.applyOptions({
-                    width: chartContainer.clientWidth,
-                    height: 400
-                });
+                klineChart.resize();
             }
-        });
-
-        // 在股票选择变化时更新K线图
-        document.getElementById('symbolSelect').addEventListener('change', function () {
-            updateKlineChart();
-        });
-
-        // 在K线周期选择变化时更新K线图
-        document.getElementById('kTypeSelect').addEventListener('change', function () {
-            updateKlineChart();
         });
     </script>
 </body>
