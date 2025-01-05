@@ -17,6 +17,12 @@ public abstract class AbstractTradingStrategy implements TradingStrategy {
     // K线类型（比如1分钟、5分钟、日K等）
     protected KType kType;
 
+    // 交易费率（假设为0.1%）
+    protected static final double TRANSACTION_FEE_RATE = 0.001;
+
+    // 最小交易单位
+    protected static final int MIN_TRADE_UNIT = 100;
+
     /**
      * 执行回测的方法
      * 
@@ -40,6 +46,8 @@ public abstract class AbstractTradingStrategy implements TradingStrategy {
         List<Double> equityCurve = new ArrayList<>();
         // 当前资金
         double currentCapital = initialCapital;
+        // 当前持仓数量
+        int currentPosition = 0;
         // 最大资金
         double maxCapital = initialCapital;
         // 最大回撤
@@ -50,29 +58,50 @@ public abstract class AbstractTradingStrategy implements TradingStrategy {
             // 计算策略信号
             String signal = calculateSignal(bar);
 
-            // 如果有交易信号，记录交易
+            // 如果有交易信号，检查是否可以执行交易
             if (signal != null) {
-                BacktestTradeRecord trade = new BacktestTradeRecord();
-                trade.setSymbol(symbol);
-                trade.setType(signal);
-                trade.setPrice(bar.getClose());
-                trade.setTime(bar.getDateTime().toString());
-                trades.add(trade);
+                int tradeQuantity = calculateTradeQuantity(signal, currentCapital, currentPosition, bar.getClose());
+
+                if (tradeQuantity > 0) {
+                    // 创建交易记录
+                    BacktestTradeRecord trade = new BacktestTradeRecord();
+                    trade.setSymbol(symbol);
+                    trade.setType(signal);
+                    trade.setPrice(bar.getClose());
+                    trade.setTime(bar.getDateTime());
+                    trade.setQuantity(tradeQuantity);
+
+                    // 更新资金和持仓
+                    double tradeCost = calculateTradeCost(tradeQuantity, bar.getClose());
+                    if ("BUY".equals(signal)) {
+                        currentCapital -= (bar.getClose() * tradeQuantity + tradeCost);
+                        currentPosition += tradeQuantity;
+                        trade.setProfit(0);
+                    } else if ("SELL".equals(signal)) {
+                        double profit = bar.getClose() * tradeQuantity - tradeCost;
+                        currentCapital += profit;
+                        currentPosition -= tradeQuantity;
+                        trade.setProfit(profit);
+                    }
+
+                    trades.add(trade);
+                }
             }
 
-            // 更新权益曲线
-            currentCapital = updateCapital(currentCapital, signal, bar.getClose());
-            equityCurve.add(currentCapital);
+            // 更新权益曲线（包括持仓市值）
+            double totalEquity = currentCapital + (currentPosition * bar.getClose());
+            equityCurve.add(totalEquity);
 
             // 计算最大回撤
-            maxCapital = Math.max(maxCapital, currentCapital);
-            double drawdown = (maxCapital - currentCapital) / maxCapital;
+            maxCapital = Math.max(maxCapital, totalEquity);
+            double drawdown = (maxCapital - totalEquity) / maxCapital;
             maxDrawdown = Math.max(maxDrawdown, drawdown);
         }
 
         // 设置回测结果
-        result.setFinalCapital(currentCapital);
-        result.setTotalReturn((currentCapital - initialCapital) / initialCapital);
+        double finalEquity = currentCapital + (currentPosition * data.get(data.size() - 1).getClose());
+        result.setFinalCapital(finalEquity);
+        result.setTotalReturn((finalEquity - initialCapital) / initialCapital);
         result.setMaxDrawdown(maxDrawdown);
         result.setTrades(trades);
         result.setEquityCurve(equityCurve);
@@ -89,20 +118,35 @@ public abstract class AbstractTradingStrategy implements TradingStrategy {
     protected abstract String calculateSignal(MarketData data);
 
     /**
-     * 更新资金的方法
+     * 计算可交易数量
      * 
-     * @param capital 当前资金
-     * @param signal  交易信号
-     * @param price   当前价格
-     * @return 更新后的资金
+     * @param signal   交易信号
+     * @param capital  当前资金
+     * @param position 当前持仓
+     * @param price    当前价格
+     * @return 可交易数量
      */
-    private double updateCapital(double capital, String signal, double price) {
-        // 简单的资金计算逻辑，实际交易中需要考虑更多因素
+    protected int calculateTradeQuantity(String signal, double capital, int position, double price) {
         if ("BUY".equals(signal)) {
-            return capital * 0.99; // 假设交易成本为1%
+            // 计算最大可买数量（考虑交易费用）
+            double maxAmount = capital / (price * (1 + TRANSACTION_FEE_RATE));
+            int maxQuantity = (int) (maxAmount / MIN_TRADE_UNIT) * MIN_TRADE_UNIT;
+            return maxQuantity > 0 ? maxQuantity : 0;
         } else if ("SELL".equals(signal)) {
-            return capital * 1.01; // 假设盈利1%
+            // 返回当前持仓数量（如果有持仓的话）
+            return position > 0 ? position : 0;
         }
-        return capital;
+        return 0;
+    }
+
+    /**
+     * 计算交易成本
+     * 
+     * @param quantity 交易数量
+     * @param price    交易价格
+     * @return 交易成本
+     */
+    protected double calculateTradeCost(int quantity, double price) {
+        return quantity * price * TRANSACTION_FEE_RATE;
     }
 }

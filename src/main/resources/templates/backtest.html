@@ -19,7 +19,217 @@
 
         #klineChart {
             width: 100%;
-            height: 400px;
+            height: 600px;
+            margin: 0;
+            padding: 0;
+            background-color: #1f1f1f;
+        }
+
+        .card {
+            border: 1px solid #dee2e6;
+            background-color: #fff;
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            color: #212529;
+        }
+
+        .card-body {
+            padding: 0;
+        }
+
+        .trade-record {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .trade-record:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .trade-record.buy {
+            border-left: 3px solid #FF4444;
+        }
+
+        .trade-record.sell {
+            border-left: 3px solid #44FF44;
+        }
+
+        .trade-record.buy.active {
+            background-color: rgba(255, 68, 68, 0.2) !important;
+            border-left: 4px solid #FF4444;
+            color: #FF4444;
+        }
+
+        .trade-record.sell.active {
+            background-color: rgba(68, 255, 68, 0.2) !important;
+            border-left: 4px solid #44FF44;
+            color: #44FF44;
+        }
+
+        .trade-record.active {
+            font-weight: bold;
+        }
+
+        .table-dark {
+            background-color: #1f1f1f;
+            color: #b0b0b0;
+        }
+
+        .table-dark thead th {
+            border-color: #333;
+            background-color: #2a2a2a;
+        }
+
+        .table-dark tbody tr {
+            border-bottom: 1px solid #333;
+        }
+
+        /* K线图和交易记录的暗色样式 */
+        .chart-card {
+            background-color: #1f1f1f;
+            border: 1px solid #333;
+        }
+
+        .chart-card .card-header {
+            background-color: #2a2a2a;
+            border-bottom: 1px solid #333;
+            color: #b0b0b0;
+            padding: 0.5rem 1rem;
+        }
+
+        .chart-card .card-body {
+            padding: 0;
+            background-color: #1f1f1f;
+            height: 600px;
+            overflow: hidden;
+        }
+
+        /* 交易记录表格样式 */
+        .trade-record {
+            cursor: pointer;
+        }
+
+        .trade-record:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        .trade-record.active {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+        }
+
+        .trade-record.buy {
+            border-left: 3px solid #FF4444;
+        }
+
+        .trade-record.sell {
+            border-left: 3px solid #44FF44;
+        }
+
+        .table-dark {
+            background-color: #1f1f1f;
+            color: #b0b0b0;
+        }
+
+        .table-dark thead th {
+            border-color: #333;
+        }
+
+        /* 回测结果表格样式 */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            font-weight: 500;
+        }
+
+        /* 表单控件样式优化 */
+        .form-control:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+
+        .form-select:focus {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+
+        /* 修改导航栏样式为亮色 */
+        .navbar {
+            background-color: #f8f9fa !important;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .navbar-brand,
+        .nav-link {
+            color: #212529 !important;
+        }
+
+        .nav-link.active {
+            color: #0d6efd !important;
+            font-weight: 500;
+        }
+
+        /* K线周期切换按钮组样式 */
+        .kline-period-group {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background-color: #1f1f1f;
+            padding: 8px;
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            border-top: 1px solid #333;
+        }
+
+        .kline-period-btn {
+            border: none;
+            background: none;
+            color: #b0b0b0;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+            min-width: 32px;
+            text-align: center;
+        }
+
+        .kline-period-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .kline-period-btn.active {
+            background-color: #2196f3;
+            color: #fff;
+        }
+
+        /* 图表容器样式更新 */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background-color: #1f1f1f;
+            border: 1px solid #333;
+            border-radius: 4px;
+            overflow: hidden;
+            padding-bottom: 40px;
+            /* 为底部按钮组留出空间 */
+        }
+
+        #klineChart {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #1f1f1f;
         }
     </style>
 </head>
@@ -72,7 +282,7 @@
                             </div>
 
                             <div class="row mb-3">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <label class="form-label">策略类型</label>
                                     <select class="form-select" name="strategyType" id="strategySelect">
                                         <option value="MA">单均线策略</option>
@@ -82,28 +292,10 @@
                                         <option value="RSI">RSI策略</option>
                                     </select>
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">K线周期</label>
-                                    <select class="form-select" name="kType" id="kTypeSelect">
-                                        <optgroup label="基础周期">
-                                            <option value="day">日K线</option>
-                                            <option value="week">周K线</option>
-                                            <option value="month">月K线</option>
-                                        </optgroup>
-                                        <optgroup label="分钟周期">
-                                            <option value="min1">1分钟</option>
-                                            <option value="min3">3分钟</option>
-                                            <option value="min5">5分钟</option>
-                                            <option value="min15">15分钟</option>
-                                            <option value="min30">30分钟</option>
-                                            <option value="min60">60分钟</option>
-                                            <option value="min120">120分钟</option>
-                                            <option value="min240">240分钟</option>
-                                        </optgroup>
-                                    </select>
-                                    <small class="form-text text-muted" id="klineCountInfo"></small>
-                                </div>
                             </div>
+
+                            <!-- 隐藏的K线周期输入 -->
+                            <input type="hidden" name="kType" id="kTypeInput" value="day">
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
@@ -199,17 +391,18 @@
                                     <div class="row mb-3">
                                         <div class="col-md-4">
                                             <label class="form-label">RSI周期</label>
-                                            <input type="number" class="form-control" name="rsiPeriod" value="14">
+                                            <input type="number" class="form-control" name="rsiPeriod" value="14"
+                                                min="1">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">超卖阈值</label>
                                             <input type="number" class="form-control" name="oversoldThreshold"
-                                                value="30">
+                                                value="30" min="0" max="50" id="oversoldInput">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">超买阈值</label>
                                             <input type="number" class="form-control" name="overboughtThreshold"
-                                                value="70">
+                                                value="70" min="50" max="100" id="overboughtInput">
                                         </div>
                                     </div>
                                 </div>
@@ -224,15 +417,52 @@
             </div>
         </div>
 
-        <!-- K线图 -->
+        <!-- K线图和交易记录 -->
         <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
+            <div class="col-9">
+                <div class="card chart-card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">K线图</h5>
                     </div>
                     <div class="card-body">
                         <div id="klineChart"></div>
+                        <!-- K线周期切换按钮组 -->
+                        <div class="kline-period-group">
+                            <button type="button" class="kline-period-btn" data-period="min1">1m</button>
+                            <button type="button" class="kline-period-btn" data-period="min3">3m</button>
+                            <button type="button" class="kline-period-btn" data-period="min5">5m</button>
+                            <button type="button" class="kline-period-btn" data-period="min15">15m</button>
+                            <button type="button" class="kline-period-btn" data-period="min30">30m</button>
+                            <button type="button" class="kline-period-btn" data-period="min60">1H</button>
+                            <button type="button" class="kline-period-btn" data-period="min120">2H</button>
+                            <button type="button" class="kline-period-btn" data-period="min240">4H</button>
+                            <button type="button" class="kline-period-btn active" data-period="day">D</button>
+                            <button type="button" class="kline-period-btn" data-period="week">W</button>
+                            <button type="button" class="kline-period-btn" data-period="month">M</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">交易记录</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="tradeRecords" style="height: 600px; overflow-y: auto;">
+                            <table class="table table-dark table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>时间</th>
+                                        <th>类型</th>
+                                        <th>价格</th>
+                                        <th>数量</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tradeRecordsBody">
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -284,9 +514,31 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/klinecharts/dist/umd/klinecharts.min.js"></script>
     <script src="/js/kline.js"></script>
     <script>
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function () {
+            // 设置默认日期范围
+            setDefaultDateRange();
+
+            // 确保图表容器已经准备好
+            setTimeout(() => {
+                if (typeof klinecharts !== 'undefined' && typeof initKlineChart === 'function') {
+                    initKlineChart();
+                    // 触发市场选择的change事件来加载股票列表
+                    document.getElementById('marketSelect').dispatchEvent(new Event('change'));
+                } else {
+                    console.error('KLineCharts library or initialization function not loaded!');
+                }
+            }, 100);
+
+            // 在股票选择变化时更新K线图
+            document.getElementById('symbolSelect').addEventListener('change', function () {
+                setTimeout(updateKlineChart, 100);
+            });
+        });
+
         // 设置默认日期范围
         function setDefaultDateRange() {
             const today = new Date();
@@ -327,25 +579,6 @@
             updateTradingDays();
         }
 
-        // 页面加载时初始化
-        $(document).ready(function () {
-            console.log('DOM loaded, initializing components...');
-            setDefaultDateRange();
-            // 触发市场选择的change事件来加载股票列表
-            document.getElementById('marketSelect').dispatchEvent(new Event('change'));
-            initKlineChart();
-
-            // 在股票选择变化时更新K线图
-            $('#symbolSelect').change(function () {
-                updateKlineChart();
-            });
-
-            // 在K线周期选择变化时更新K线图
-            $('#kTypeSelect').change(function () {
-                updateKlineChart();
-            });
-        });
-
         // 策略参数切换
         document.getElementById('strategySelect').addEventListener('change', function () {
             document.querySelectorAll('.strategy-params').forEach(div => {
@@ -365,12 +598,13 @@
             const endDate = formData.get('endDate');
             const kType = formData.get('kType');
             const market = formData.get('market');
+            const strategyType = formData.get('strategyType');
 
             // 构建请求数据
             const requestData = {
                 symbol: formData.get('symbol'),
                 market: market.toUpperCase(),
-                strategyType: formData.get('strategyType'),
+                strategyType: strategyType,
                 initialCapital: parseFloat(formData.get('initialCapital')),
                 startTime: startDate + ' 00:00:00',
                 endTime: endDate + ' 23:59:59',
@@ -378,9 +612,9 @@
             };
 
             // 根据策略类型添加相应的参数
-            switch (formData.get('strategyType')) {
+            switch (strategyType) {
                 case 'MA':
-                    requestData.shortPeriod = parseInt(formData.get('maPeriod'));
+                    requestData.maPeriod = parseInt(formData.get('maPeriod'));
                     break;
                 case 'DOUBLE_MA':
                     requestData.shortPeriod = parseInt(formData.get('shortPeriod'));
@@ -396,9 +630,27 @@
                     requestData.kValue = parseFloat(formData.get('kValue'));
                     break;
                 case 'RSI':
-                    requestData.shortPeriod = parseInt(formData.get('rsiPeriod'));
-                    requestData.oversoldThreshold = parseFloat(formData.get('oversoldThreshold'));
-                    requestData.overboughtThreshold = parseFloat(formData.get('overboughtThreshold'));
+                    const oversoldValue = parseFloat(formData.get('oversoldThreshold'));
+                    const overboughtValue = parseFloat(formData.get('overboughtThreshold'));
+                    const rsiPeriod = parseInt(formData.get('rsiPeriod'));
+
+                    // RSI参数验证
+                    if (rsiPeriod <= 0) {
+                        alert('RSI周期必须大于0');
+                        return;
+                    }
+                    if (oversoldValue < 0 || overboughtValue > 100) {
+                        alert('RSI阈值必须在0到100之间');
+                        return;
+                    }
+                    if (oversoldValue >= overboughtValue) {
+                        alert('超卖阈值必须小于超买阈值');
+                        return;
+                    }
+
+                    requestData.shortPeriod = rsiPeriod;
+                    requestData.oversoldThreshold = oversoldValue;
+                    requestData.overboughtThreshold = overboughtValue;
                     break;
             }
 
@@ -453,6 +705,30 @@
                             }
                         }
                     });
+
+                    // 更新K线图，添加交易信号
+                    if (result.trades && result.trades.length > 0) {
+                        // 获取当前K线数据
+                        const symbol = requestData.symbol;
+                        const startDate = requestData.startTime.split(' ')[0];
+                        const endDate = requestData.endTime.split(' ')[0];
+                        const kType = requestData.kType;
+                        const market = requestData.market;
+
+                        fetch(`/api/backtest/kline?symbol=${symbol}&startDate=${startDate}&endDate=${endDate}&kType=${kType}&market=${market}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (!data || data.length === 0) {
+                                    console.error('No data available for K-line chart');
+                                    return;
+                                }
+                                // 更新K线图，包含交易信号
+                                setTimeout(() => updateKlineChartWithData(data, result.trades), 100);
+                            })
+                            .catch(error => {
+                                console.error('获取K线数据失败:', error);
+                            });
+                    }
                 })
                 .catch(error => {
                     console.error('回测失败:', error);
@@ -491,7 +767,7 @@
                         symbolSelect.appendChild(option);
                     });
                     console.log('Symbols loaded, updating chart...');
-                    updateKlineChart();
+                    setTimeout(updateKlineChart, 100);
                 })
                 .catch(error => {
                     console.error('Error loading symbols:', error);
@@ -544,7 +820,7 @@
             const symbol = document.getElementById('symbolSelect').value;
             const startDate = document.querySelector('input[name="startDate"]').value;
             const endDate = document.querySelector('input[name="endDate"]').value;
-            const kType = document.getElementById('kTypeSelect').value;
+            const kType = document.getElementById('kTypeInput').value;
             const market = document.getElementById('marketSelect').value.toUpperCase();
 
             console.log('Updating K-line chart with:', { symbol, startDate, endDate, kType, market });
@@ -572,6 +848,76 @@
         window.addEventListener('resize', () => {
             if (klineChart) {
                 klineChart.resize();
+            }
+        });
+
+        // 添加K线周期切换处理
+        document.addEventListener('DOMContentLoaded', function () {
+            const periodButtons = document.querySelectorAll('.kline-period-btn');
+            const kTypeInput = document.getElementById('kTypeInput');
+
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    // 移除其他按钮的active类
+                    periodButtons.forEach(btn => btn.classList.remove('active'));
+                    // 添加当前按钮的active类
+                    this.classList.add('active');
+
+                    // 更新隐藏的input值
+                    const period = this.dataset.period;
+                    kTypeInput.value = period;
+
+                    // 如果已经有数据，重新获取新周期的数据
+                    const symbol = document.getElementById('symbolSelect').value;
+                    if (symbol) {
+                        // 获取当前日期范围
+                        const startDate = document.getElementById('startDate').value;
+                        const endDate = document.getElementById('endDate').value;
+                        const market = document.getElementById('marketSelect').value;
+
+                        // 重新获取K线数据
+                        fetchKlineData(symbol, startDate, endDate, period, market)
+                            .then(data => {
+                                updateKlineChartWithData(data, []);
+                            })
+                            .catch(error => {
+                                console.error('Error fetching new period data:', error);
+                            });
+                    }
+                });
+            });
+        });
+
+        // RSI参数验证
+        document.getElementById('oversoldInput').addEventListener('change', validateRSILevels);
+        document.getElementById('overboughtInput').addEventListener('change', validateRSILevels);
+
+        function validateRSILevels() {
+            const oversoldInput = document.getElementById('oversoldInput');
+            const overboughtInput = document.getElementById('overboughtInput');
+            const oversoldValue = parseFloat(oversoldInput.value);
+            const overboughtValue = parseFloat(overboughtInput.value);
+
+            if (oversoldValue >= overboughtValue) {
+                alert('超卖阈值必须小于超买阈值');
+                // 重置为默认值
+                oversoldInput.value = 30;
+                overboughtInput.value = 70;
+            }
+        }
+
+        // 表单提交前验证
+        document.getElementById('backtestForm').addEventListener('submit', function (e) {
+            const strategyType = document.getElementById('strategySelect').value;
+            if (strategyType === 'RSI') {
+                const oversoldValue = parseFloat(document.getElementById('oversoldInput').value);
+                const overboughtValue = parseFloat(document.getElementById('overboughtInput').value);
+                if (oversoldValue >= overboughtValue) {
+                    e.preventDefault();
+                    alert('超卖阈值必须小于超买阈值');
+                    return false;
+                }
             }
         });
     </script>

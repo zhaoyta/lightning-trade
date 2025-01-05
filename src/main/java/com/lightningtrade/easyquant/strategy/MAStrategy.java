@@ -1,9 +1,12 @@
 package com.lightningtrade.easyquant.strategy;
 
 import org.springframework.stereotype.Component;
+import org.ta4j.core.*;
+import org.ta4j.core.indicators.SMAIndicator;
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import com.lightningtrade.easyquant.model.MarketData;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 
 /**
  * 移动平均线策略
@@ -16,23 +19,10 @@ import java.util.Queue;
  */
 @Component
 public class MAStrategy extends AbstractTradingStrategy {
-    /**
-     * 移动平均线周期
-     * 默认使用20日均线，可通过构造函数自定义
-     */
     private final int period;
-
-    /**
-     * 用于存储历史价格的队列
-     * 当新价格进入时，最老的价格将被移除，保持队列长度等于周期
-     */
-    private final Queue<Double> prices = new LinkedList<>();
-
-    /**
-     * 价格总和
-     * 用于快速计算移动平均线，避免每次都遍历队列求和
-     */
-    private double sum = 0;
+    private BarSeries series;
+    private ClosePriceIndicator closePrice;
+    private SMAIndicator sma;
 
     /**
      * 默认构造函数
@@ -49,6 +39,9 @@ public class MAStrategy extends AbstractTradingStrategy {
      */
     public MAStrategy(int period) {
         this.period = period;
+        this.series = new BaseBarSeriesBuilder().withName("MA_Strategy").build();
+        this.closePrice = new ClosePriceIndicator(series);
+        this.sma = new SMAIndicator(closePrice, period);
     }
 
     /**
@@ -63,25 +56,24 @@ public class MAStrategy extends AbstractTradingStrategy {
      */
     @Override
     protected String calculateSignal(MarketData data) {
-        // 获取最新收盘价
-        double price = data.getClose();
-
-        // 更新移动平均线数据
-        prices.offer(price);
-        sum += price;
-
-        // 当队列长度超过周期时，移除最老的价格
-        if (prices.size() > period) {
-            sum -= prices.poll();
-        }
+        // 添加新的K线数据
+        ZonedDateTime dateTime = data.getDateTime().atZone(ZoneId.systemDefault());
+        series.addBar(dateTime,
+                data.getOpen(),
+                data.getHigh(),
+                data.getLow(),
+                data.getClose(),
+                data.getVolume());
 
         // 在累积足够的数据之前，不产生交易信号
-        if (prices.size() < period) {
+        int index = series.getEndIndex();
+        if (index < period) {
             return null;
         }
 
-        // 计算移动平均线
-        double ma = sum / period;
+        // 获取最新价格和均线值
+        double price = data.getClose();
+        double ma = sma.getValue(index).doubleValue();
 
         // 生成交易信号
         if (price > ma * 1.02) { // 价格高于MA 2%时买入
@@ -90,6 +82,23 @@ public class MAStrategy extends AbstractTradingStrategy {
             return "SELL";
         }
 
+        // 定期清理历史数据
+        cleanHistoricalData();
+
         return null; // 价格在MA的2%范围内，不产生信号
+    }
+
+    /**
+     * 清理历史数据
+     * 当数据量过大时，清理旧数据以节省内存
+     */
+    private void cleanHistoricalData() {
+        if (series.getBarCount() > period * 2) {
+            // 保留最近的两倍周期数据
+            int removeCount = series.getBarCount() - period * 2;
+            for (int i = 0; i < removeCount; i++) {
+                series.getBar(0); // 移除最早的数据
+            }
+        }
     }
 }

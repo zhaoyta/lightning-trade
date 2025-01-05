@@ -1,120 +1,131 @@
 package com.lightningtrade.easyquant.strategy;
 
 import org.springframework.stereotype.Component;
+import org.ta4j.core.*;
+import org.ta4j.core.indicators.EMAIndicator;
+import org.ta4j.core.indicators.MACDIndicator;
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import com.lightningtrade.easyquant.model.MarketData;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 
 /**
- * MACD (Moving Average Convergence Divergence) 策略实现类
- * MACD是一种趋势跟踪动量指标，通过比较两条不同速度的移动平均线来判断买卖时机
- * 计算过程：
- * 1. 计算快速EMA和慢速EMA
- * 2. MACD线 = 快速EMA - 慢速EMA
- * 3. 信号线 = MACD的移动平均线
- * - 当MACD线从下向上穿过信号线时产生买入信号（金叉）
- * - 当MACD线从上向下穿过信号线时产生卖出信号（死叉）
+ * MACD策略
+ * 使用MACD指标（Moving Average Convergence/Divergence）产生交易信号
+ * 
+ * 策略逻辑：
+ * 1. 当MACD线上穿信号线时，产生买入信号（看涨信号）
+ * 2. 当MACD线下穿信号线时，产生卖出信号（看跌信号）
+ * 3. 在MACD线和信号线未发生交叉时，不产生交易信号
+ * 
+ * MACD参数说明：
+ * - 快速EMA周期：12（用于计算DIF）
+ * - 慢速EMA周期：26（用于计算DIF）
+ * - 信号线EMA周期：9（用于计算DEA）
+ * - DIF = 快速EMA - 慢速EMA
+ * - DEA = DIF的9日EMA
+ * - MACD = 2 * (DIF - DEA)
  */
 @Component
 public class MACDStrategy extends AbstractTradingStrategy {
-    // 快速移动平均线周期
-    private final int fastPeriod;
-    // 慢速移动平均线周期
-    private final int slowPeriod;
-    // 信号线周期
-    private final int signalPeriod;
-    // 快速指数移动平均线的当前值
-    private double fastEMA = 0;
-    // 慢速指数移动平均线的当前值
-    private double slowEMA = 0;
-    // 信号线的当前值（MACD的移动平均线）
-    private double signalEMA = 0;
-    // 上一次的MACD值
-    private Double lastMACD = null;
-    // 上一次的信号线值
-    private Double lastSignal = null;
-    // 指标是否已经完成初始化
-    private boolean initialized = false;
-    // 接收到的价格点计数
-    private int count = 0;
+    private final int fastPeriod; // 快速EMA周期
+    private final int slowPeriod; // 慢速EMA周期
+    private final int signalPeriod; // 信号线周期
+    private BarSeries series;
+    private ClosePriceIndicator closePrice;
+    private MACDIndicator macd;
+    private EMAIndicator signal;
 
     /**
-     * 默认构造函数，使用标准的MACD参数设置
-     * fastPeriod=12: 12日快速移动平均线
-     * slowPeriod=26: 26日慢速移动平均线
-     * signalPeriod=9: 9日信号线
+     * 默认构造函数
+     * 使用标准的MACD参数：12,26,9
      */
     public MACDStrategy() {
-        this(12, 26, 9); // 默认使用12、26、9
+        this(12, 26, 9);
     }
 
     /**
-     * 自定义参数构造函数
+     * 自定义参数的构造函数
      * 
-     * @param fastPeriod   快速移动平均线周期
-     * @param slowPeriod   慢速移动平均线周期
+     * @param fastPeriod   快速EMA周期
+     * @param slowPeriod   慢速EMA周期
      * @param signalPeriod 信号线周期
      */
     public MACDStrategy(int fastPeriod, int slowPeriod, int signalPeriod) {
+        if (fastPeriod >= slowPeriod) {
+            throw new IllegalArgumentException("Fast period must be less than slow period");
+        }
         this.fastPeriod = fastPeriod;
         this.slowPeriod = slowPeriod;
         this.signalPeriod = signalPeriod;
+        this.series = new BaseBarSeriesBuilder().withName("MACD_Strategy").build();
+        this.closePrice = new ClosePriceIndicator(series);
+        this.macd = new MACDIndicator(closePrice, fastPeriod, slowPeriod);
+        this.signal = new EMAIndicator(macd, signalPeriod);
     }
 
     /**
      * 计算交易信号
+     * 根据MACD线和信号线的交叉关系，生成买入或卖出信号
      * 
-     * @param data 市场数据
-     * @return 交易信号：BUY（买入）, SELL（卖出）, null（无信号）
+     * @param data 市场数据，包含最新的OHLCV数据
+     * @return 交易信号：
+     *         "BUY" - 买入信号，当MACD线上穿信号线
+     *         "SELL" - 卖出信号，当MACD线下穿信号线
+     *         null - 无交易信号，MACD线和信号线未发生交叉
      */
     @Override
     protected String calculateSignal(MarketData data) {
-        double price = data.getClose();
-        count++;
+        // 添加新的K线数据
+        ZonedDateTime dateTime = data.getDateTime().atZone(ZoneId.systemDefault());
+        series.addBar(dateTime,
+                data.getOpen(),
+                data.getHigh(),
+                data.getLow(),
+                data.getClose(),
+                data.getVolume());
 
-        // 初始化EMA值
-        // EMA需要一定数量的数据才能开始产生有效的信号
-        // 使用第一个价格点作为EMA的初始值
-        if (!initialized) {
-            if (count == 1) {
-                fastEMA = price;
-                slowEMA = price;
-                signalEMA = 0;
-            } else if (count == slowPeriod) {
-                initialized = true;
-            }
+        // 在累积足够的数据之前，不产生交易信号
+        int index = series.getEndIndex();
+        if (index < slowPeriod + signalPeriod) {
             return null;
         }
 
-        // 计算MACD指标
-        // alpha = 2/(period + 1) 是EMA的平滑系数
-        double fastAlpha = 2.0 / (fastPeriod + 1);
-        double slowAlpha = 2.0 / (slowPeriod + 1);
-        double signalAlpha = 2.0 / (signalPeriod + 1);
+        // 获取当前和前一个时间点的MACD值和信号线值
+        double macdValue = macd.getValue(index).doubleValue();
+        double signalValue = signal.getValue(index).doubleValue();
+        double prevMacdValue = macd.getValue(index - 1).doubleValue();
+        double prevSignalValue = signal.getValue(index - 1).doubleValue();
 
-        // 计算快速和慢速EMA
-        // EMA = 当前价格 * alpha + 前一日EMA * (1 - alpha)
-        fastEMA = price * fastAlpha + fastEMA * (1 - fastAlpha);
-        slowEMA = price * slowAlpha + slowEMA * (1 - slowAlpha);
+        // 判断MACD线和信号线的交叉
+        boolean crossUp = prevMacdValue <= prevSignalValue && macdValue > signalValue; // MACD线上穿信号线
+        boolean crossDown = prevMacdValue >= prevSignalValue && macdValue < signalValue; // MACD线下穿信号线
 
-        // 计算MACD线和信号线
-        double macd = fastEMA - slowEMA;
-        signalEMA = macd * signalAlpha + signalEMA * (1 - signalAlpha);
-
-        String signal = null;
-        if (lastMACD != null && lastSignal != null) {
-            // MACD金叉：MACD线从下穿过信号线，产生买入信号
-            if (lastMACD <= lastSignal && macd > signalEMA) {
-                signal = "BUY";
-            }
-            // MACD死叉：MACD线从上穿过信号线，产生卖出信号
-            else if (lastMACD >= lastSignal && macd < signalEMA) {
-                signal = "SELL";
-            }
+        // 生成交易信号
+        if (crossUp) {
+            return "BUY";
+        } else if (crossDown) {
+            return "SELL";
         }
 
-        // 保存当前值用于下次计算
-        lastMACD = macd;
-        lastSignal = signalEMA;
+        // 定期清理历史数据
+        cleanHistoricalData();
 
-        return signal;
+        return null; // MACD线和信号线未发生交叉，不产生信号
+    }
+
+    /**
+     * 清理历史数据
+     * 当数据量过大时，清理旧数据以节省内存
+     */
+    private void cleanHistoricalData() {
+        int maxPeriod = Math.max(slowPeriod + signalPeriod, fastPeriod + signalPeriod);
+        if (series.getBarCount() > maxPeriod * 2) {
+            // 保留最近的两倍周期数据
+            int removeCount = series.getBarCount() - maxPeriod * 2;
+            for (int i = 0; i < removeCount; i++) {
+                series.getBar(0); // 移除最早的数据
+            }
+        }
     }
 }

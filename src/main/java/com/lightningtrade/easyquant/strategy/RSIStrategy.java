@@ -1,119 +1,129 @@
 package com.lightningtrade.easyquant.strategy;
 
 import org.springframework.stereotype.Component;
+import org.ta4j.core.*;
+import org.ta4j.core.indicators.RSIIndicator;
+import org.ta4j.core.indicators.helpers.ClosePriceIndicator;
 import com.lightningtrade.easyquant.model.MarketData;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.time.ZonedDateTime;
+import java.time.ZoneId;
 
 /**
- * RSI (Relative Strength Index) 策略实现类
- * RSI是一种动量指标，用于衡量价格变动的强度，判断市场是否超买或超卖
- * 计算过程：
- * 1. 计算每日价格变动的涨跌幅
- * 2. 分别计算上涨和下跌的平均值
- * 3. RSI = 100 - (100 / (1 + RS))，其中RS = 平均上涨幅度 / 平均下跌幅度
- * - 当RSI低于超卖线时产生买入信号
- * - 当RSI高于超买线时产生卖出信号
+ * RSI策略
+ * 使用相对强弱指标（Relative Strength Index）产生交易信号
+ * 
+ * 策略逻辑：
+ * 1. 当RSI值低于超卖线（默认30）时，产生买入信号
+ * 2. 当RSI值高于超买线（默认70）时，产生卖出信号
+ * 3. 当RSI值在超买超卖线之间时，不产生交易信号
+ * 
+ * 参数说明：
+ * - RSI周期：14日（默认值）
+ * - 超买线：70（默认值）
+ * - 超卖线：30（默认值）
  */
 @Component
 public class RSIStrategy extends AbstractTradingStrategy {
-    // RSI计算周期
-    private final int period;
-    // RSI超买阈值
-    private final double overbought;
-    // RSI超卖阈值
-    private final double oversold;
-    // 存储周期内的上涨幅度队列
-    private final Queue<Double> gains = new LinkedList<>();
-    // 存储周期内的下跌幅度队列
-    private final Queue<Double> losses = new LinkedList<>();
-    // 上一次的价格
-    private Double lastPrice = null;
-    // 周期内上涨幅度之和
-    private double sumGains = 0;
-    // 周期内下跌幅度之和
-    private double sumLosses = 0;
+    private final int period; // RSI计算周期
+    private final double overbought; // 超买线
+    private final double oversold; // 超卖线
+    private BarSeries series;
+    private ClosePriceIndicator closePrice;
+    private RSIIndicator rsi;
 
     /**
-     * 默认构造函数，使用标准的RSI参数设置
-     * period=14: 14日RSI
-     * overbought=70: RSI高于70视为超买
-     * oversold=30: RSI低于30视为超卖
+     * 默认构造函数
+     * 使用14日RSI，30超卖，70超买作为默认参数
      */
     public RSIStrategy() {
-        this(14, 70, 30); // 默认使用14日RSI，超买70，超卖30
+        this(14, 30, 70);
     }
 
     /**
-     * 自定义参数构造函数
+     * 自定义参数的构造函数
      * 
      * @param period     RSI计算周期
-     * @param overbought 超买阈值
-     * @param oversold   超卖阈值
+     * @param oversold   超卖线
+     * @param overbought 超买线
      */
-    public RSIStrategy(int period, double overbought, double oversold) {
+    public RSIStrategy(int period, double oversold, double overbought) {
+        if (period <= 0) {
+            throw new IllegalArgumentException("Period must be positive");
+        }
+        if (oversold >= overbought) {
+            throw new IllegalArgumentException("Overbought level must be greater than oversold level");
+        }
+        if (oversold < 0 || overbought > 100) {
+            throw new IllegalArgumentException("RSI levels must be between 0 and 100");
+        }
+
         this.period = period;
-        this.overbought = overbought;
         this.oversold = oversold;
+        this.overbought = overbought;
+        this.series = new BaseBarSeriesBuilder().withName("RSI_Strategy").build();
+        this.closePrice = new ClosePriceIndicator(series);
+        this.rsi = new RSIIndicator(closePrice, period);
     }
 
     /**
      * 计算交易信号
+     * 根据RSI值与超买超卖线的关系，生成买入或卖出信号
      * 
-     * @param data 市场数据
-     * @return 交易信号：BUY（买入）, SELL（卖出）, null（无信号）
+     * @param data 市场数据，包含最新的OHLCV数据
+     * @return 交易信号：
+     *         "BUY" - 买入信号，当RSI值低于超卖线
+     *         "SELL" - 卖出信号，当RSI值高于超买线
+     *         null - 无交易信号，RSI值在超买超卖线之间
      */
     @Override
     protected String calculateSignal(MarketData data) {
-        double price = data.getClose();
+        // 添加新的K线数据
+        ZonedDateTime dateTime = data.getDateTime().atZone(ZoneId.systemDefault());
+        series.addBar(dateTime,
+                data.getOpen(),
+                data.getHigh(),
+                data.getLow(),
+                data.getClose(),
+                data.getVolume());
 
-        // 需要两个价格点才能计算价格变动
-        if (lastPrice != null) {
-            // 计算价格变动和涨跌幅
-            double change = price - lastPrice;
-            // 上涨幅度（价格上涨时为正值，下跌时为0）
-            double gain = Math.max(change, 0);
-            // 下跌幅度（价格下跌时为正值，上涨时为0）
-            double loss = Math.max(-change, 0);
-
-            // 更新gains和losses队列
-            // 将新的涨跌幅加入队列并更新总和
-            gains.offer(gain);
-            losses.offer(loss);
-            sumGains += gain;
-            sumLosses += loss;
-
-            // 当队列长度超过周期时，移除最早的数据
-            if (gains.size() > period) {
-                sumGains -= gains.poll();
-                sumLosses -= losses.poll();
-            }
-
-            // 当收集到足够的数据点时开始计算RSI
-            if (gains.size() == period) {
-                // 计算平均涨跌幅
-                double avgGain = sumGains / period;
-                double avgLoss = sumLosses / period;
-
-                // 计算RSI
-                // 当没有下跌时，RSI = 100
-                double rs = avgLoss == 0 ? 100 : avgGain / avgLoss;
-                double rsi = 100 - (100 / (1 + rs));
-
-                // 生成交易信号
-                // RSI低于超卖线，市场超卖，产生买入信号
-                if (rsi < oversold) {
-                    return "BUY";
-                }
-                // RSI高于超买线，市场超买，产生卖出信号
-                else if (rsi > overbought) {
-                    return "SELL";
-                }
-            }
+        // 在累积足够的数据之前，不产生交易信号
+        int index = series.getEndIndex();
+        if (index < period) {
+            return null;
         }
 
-        // 保存当前价格用于下次计算
-        lastPrice = price;
-        return null;
+        // 获取当前和前一个时间点的RSI值
+        double currentRSI = rsi.getValue(index).doubleValue();
+        double prevRSI = rsi.getValue(index - 1).doubleValue();
+
+        // 判断RSI突破
+        boolean crossDownOversold = prevRSI >= oversold && currentRSI < oversold; // RSI下穿超卖线
+        boolean crossUpOverbought = prevRSI <= overbought && currentRSI > overbought; // RSI上穿超买线
+
+        // 生成交易信号
+        if (crossDownOversold) {
+            return "BUY";
+        } else if (crossUpOverbought) {
+            return "SELL";
+        }
+
+        // 定期清理历史数据
+        cleanHistoricalData();
+
+        return null; // RSI值在超买超卖线之间，不产生信号
+    }
+
+    /**
+     * 清理历史数据
+     * 当数据量过大时，清理旧数据以节省内存
+     */
+    private void cleanHistoricalData() {
+        if (series.getBarCount() > period * 2) {
+            // 保留最近的两倍周期数据
+            int removeCount = series.getBarCount() - period * 2;
+            for (int i = 0; i < removeCount; i++) {
+                series.getBar(0); // 移除最早的数据
+            }
+        }
     }
 }
